@@ -1,0 +1,10 @@
+menu "Color Management Unit"
+
+config PXA_ICR
+	tristate "PXA ICR driver"
+	default m
+	help
+	   Add the color management driver for PXA
+
+endmenu
+

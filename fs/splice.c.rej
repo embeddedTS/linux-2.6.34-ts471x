@@ -1,0 +1,19 @@
+*************** static int direct_splice_actor(struct pipe_inode_info *pipe,
+*** 1234,1241 ****
+  {
+  	struct file *file = sd->u.file;
+  
+- 	return vfs_splice_from(pipe, file, &file->f_pos, sd->total_len,
+- 			       sd->flags);
+  }
+  
+  /**
+--- 1232,1239 ----
+  {
+  	struct file *file = sd->u.file;
+  
++ 	return do_splice_from(pipe, file, &file->f_pos, sd->total_len,
++ 			      sd->flags);
+  }
+  
+  /**

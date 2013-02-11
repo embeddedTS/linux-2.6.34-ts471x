@@ -1,0 +1,31 @@
+#ifndef __ASM_MACH_MFP_TETON_BGA_H
+#define __ASM_MACH_MFP_PXA168_H
+
+#include <plat/mfp.h>
+#include <mach/mfp.h>
+
+/*MMC Enable*/
+#define GPIO27_MMC1_EN          MFP_CFG(GPIO27, AF5)
+
+/*MMC2*/
+#define GPIO117_MMC2_CMD        MFP_CFG(GPIO117, AF4)
+#define GPIO118_MMC2_CLK        MFP_CFG(GPIO118, AF4)
+#define GPIO119_MMC2_DAT0       MFP_CFG(GPIO119, AF4)
+#define GPIO120_MMC2_DAT1       MFP_CFG(GPIO120, AF4)
+#define GPIO121_MMC2_DAT2       MFP_CFG(GPIO121, AF4)
+#define GPIO122_MMC2_DAT3       MFP_CFG(GPIO122, AF4)
+
+/*I2S*/
+#define GPIO116_I2S_TXD         MFP_CFG(GPIO116, AF1)
+
+/*MSPRO*/
+#define GPIO42_MSP_BS           MFP_CFG(GPIO42, AF3)
+#define GPIO44_MSP_DAT1         MFP_CFG(GPIO44, AF3)
+#define GPIO45_MSP_DAT0         MFP_CFG(GPIO45, AF3)
+#define GPIO46_MSP_DAT2         MFP_CFG(GPIO46, AF3)
+#define GPIO48_MSP_DAT3         MFP_CFG(GPIO48, AF3)
+#define GPIO50_MSP_SCLK         MFP_CFG(GPIO50, AF3)
+
+#define GPIO47_MSP_INS          MFP_CFG(GPIO47, AF0)
+
+#endif /* __ASM_MACH_MFP_TETON_BGA_H */

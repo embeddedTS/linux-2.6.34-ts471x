@@ -1,0 +1,5 @@
+if PLAT_PXA
+
+source "arch/arm/plat-pxa/imm/Kconfig"
+
+endif

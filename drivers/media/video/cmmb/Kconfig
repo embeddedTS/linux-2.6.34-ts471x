@@ -1,0 +1,24 @@
+menuconfig CMMB
+	tristate "China Mobile Multimedia Broadcasting"
+	---help---
+	  CMMB is a mobile television and multimedia standard developed
+	  and specified in China by the State Administration of Radio,
+	  Film, and Television (SARFT).
+
+if CMMB
+
+config CMMB_IF101
+	tristate "CMMB Demodulator IF101 Controller support"
+	depends on VIDEO_V4L2
+	select SPI
+	select SPI_PXA2XX
+	---help---
+	  This is a video4linux2 driver for the CMMB Demodulator IF101
+	  controller.
+
+config CMMB_CA
+	tristate "CA drvier for CMMB module"
+	---help---
+	  This is the ca driver for cmmb module
+
+endif #CMMB
