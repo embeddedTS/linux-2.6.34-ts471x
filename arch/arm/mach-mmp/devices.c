@@ -153,7 +153,7 @@ struct platform_device pxa910_device_acipc = {
 };
 #endif
 
-#if defined (CONFIG_USB) || defined (CONFIG_USB_GADGET)
+#if defined (CONFIG_USB) || defined (CONFIG_USB_GADGET) || defined (CONFIG_USB_MODULE)
 
 /*****************************************************************************
  * The registers read/write routines

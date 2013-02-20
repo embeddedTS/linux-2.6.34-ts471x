@@ -1609,6 +1609,7 @@ void usb_disconnect(struct usb_device **pdev)
 
 	put_device(&udev->dev);
 }
+EXPORT_SYMBOL(usb_disconnect);
 
 #ifdef CONFIG_USB_ANNOUNCE_NEW_DEVICES
 static void show_string(struct usb_device *udev, char *id, char *string)
