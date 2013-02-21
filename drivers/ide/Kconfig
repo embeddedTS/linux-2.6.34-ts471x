@@ -707,6 +707,12 @@ config BLK_DEV_IDE_AT91
 	depends on ARM && ARCH_AT91 && !ARCH_AT91RM9200 && !ARCH_AT91X40
 	select IDE_TIMINGS
 
+config BLK_DEV_IDE_TSRF2CF
+	tristate "TS-RF2-CF Support"
+	depends on ARM
+	help
+	  Adds support for the TS-RF2-CF PC104 device.
+
 config BLK_DEV_IDE_ICSIDE
 	tristate "ICS IDE interface support"
 	depends on ARM && ARCH_ACORN

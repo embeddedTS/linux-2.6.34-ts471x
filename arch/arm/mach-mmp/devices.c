@@ -195,6 +195,7 @@ void u2o_write(unsigned base, unsigned offset, unsigned value)
 /********************************************************************
  * USB 2.0 OTG controller
  */
+
 int pxa168_usb_phy_init(unsigned base)
 {	
 	static int init_done;

@@ -239,4 +239,8 @@ static inline void pxa168_add_cs4344(void)
 			"unable to register CS4344 device: %d\n", ret);
 }
 
+#ifdef CONFIG_MACH_TS47XX
+extern void ts4700_init_mux_irq(void);
+#endif
+
 #endif /* __ASM_MACH_PXA168_H */

@@ -1253,7 +1253,7 @@ static void __init ts4700_init(void)
 	   pxa168_add_fb_ovly(&ts4700_lcd_ovly_info);
 	}
 
-	//ts4700_create_proc_irq();
+	ts4700_create_proc_irq();
 
 }
 
