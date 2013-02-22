@@ -1133,6 +1133,9 @@ static void ts4700_create_proc_irq(void)
       if (!desc)
          continue;
 
+      if(irq > 80)
+	 break;
+
       sprintf(name, "irq/%d/irq", irq);
 
       proc_create_data(name, 0600, NULL,
