@@ -93,6 +93,5 @@ static void __exit ts4700_isa16550_exit(void)
 module_init(ts4700_isa16550_init);
 module_exit(ts4700_isa16550_exit);
 
-MODULE_DESCRIPTION("TS-4700 PC/104 16550 support.  This driver should only be loaded as a module,"
-                   " and can be loaded multiple times for supporting multiple serial modules.");
+MODULE_DESCRIPTION("TS-4700 PC/104 16550 support.  This driver should only be loaded as a module.");
 MODULE_LICENSE("GPL");
