@@ -128,10 +128,11 @@ static void mohawk_l2_flush_range(unsigned long start, unsigned long end)
 static int __init mohawk_l2_init(void)
 {
 	pr_info("Mohawk L2 cache enabled.\n");
+#ifdef CPU_L2_CACHE
 	outer_cache.inv_range = mohawk_l2_inv_range;
 	outer_cache.clean_range = mohawk_l2_clean_range;
 	outer_cache.flush_range = mohawk_l2_flush_range;
-
+#endif
 	return 0;
 }
 
