@@ -805,9 +805,6 @@ static int smsc95xx_reset(struct usbnet *dev)
 		return ret;
 	}
 
-	smsc95xx_init_mac_address(dev);
-
-	ret = smsc95xx_set_mac_address(dev);
 	if (ret < 0)
 		return ret;
 
@@ -1025,7 +1022,12 @@ static int smsc95xx_bind(struct usbnet *dev, struct usb_interface *intf)
 	struct smsc95xx_priv *pdata = NULL;
 	int ret;
 
+
 	printk(KERN_INFO SMSC_CHIPNAME " v" SMSC_DRIVER_VERSION "\n");
+
+	smsc95xx_init_mac_address(dev);
+	ret = smsc95xx_set_mac_address(dev);
+
 
 	ret = usbnet_get_endpoints(dev, intf);
 	if (ret < 0) {
