@@ -37,7 +37,7 @@
 #include <linux/workqueue.h>
 #include <linux/mii.h>
 #include <linux/clk.h>
-
+#include <linux/module.h>
 #include <linux/io.h>
 #include <linux/types.h>
 #include <asm/pgtable.h>
@@ -47,6 +47,8 @@
 #include <asm/cacheflush.h>
 
 #include <mach/pxa168_eth.h>
+
+int nophy = 0;
 
 #define NAPI_PMR
 
@@ -60,7 +62,6 @@
 /*
  * Registers
  */
-
 #define PHY_ADDRESS		0x0000
 #define SMI			0x0010
 #define PORT_CONFIG		0x0400
@@ -113,6 +114,7 @@
 
 
 /* Bit definitions of the Port Config Reg */
+#define PCR_HD			(1<<15)
 #define PCR_HS			(1<<12)
 #define PCR_EN	 		(1<<7)
 #define PCR_PM	 		(1<<0)
@@ -125,6 +127,7 @@
 #define PCXR_MFL_2048		(2<<14)
 #define PCXR_MFL_64K		(3<<14)
 #define PCXR_FLP		(1<<11)
+#define PCXR_FORCE_100M_FD	(3<<18|0xb<<9)
 #define PCXR_PRIO_TX_OFF	3
 #define PCXR_TX_HIGH_PRI	(7<<PCXR_PRIO_TX_OFF)
 
@@ -273,7 +276,6 @@ static char pxa168_mac_str[] = {0x00,0x09,0x11,0x22,0x33,0x45};
 
 static char MarvellOUI[3] = {0x00, 0x09, 0x11};
 
-
 static int pxa168_eth_open(struct net_device *dev);
 static int pxa168_eth_stop(struct net_device *dev);
 
@@ -392,6 +394,8 @@ static void ethernet_phy_set(struct pxa168_private *mp)
 	u16 phy_addr = mp->phy_addr;
 	int addr_shift = 5 * mp->port_num;
 
+	if(nophy) return;
+
 	/* only support 3 ports */
 	BUG_ON(mp->port_num > 2);
 
@@ -404,6 +408,8 @@ static void ethernet_phy_set(struct pxa168_private *mp)
 static void ethernet_phy_reset(struct pxa168_private *mp)
 {
 	unsigned int phy_reg_data;
+
+	if(nophy) return;
 
 	/* Reset the PHY */
 	eth_port_read_smi_reg(mp, 0, &phy_reg_data);
@@ -421,6 +427,8 @@ static int ethernet_phy_detect(struct pxa168_private *mp)
 {
 	unsigned int val, tmp, mii_status;
 	int addr;
+
+	if(nophy) return 0;
 
 	for (addr = 0; addr < 32; addr++) {
 
@@ -459,8 +467,8 @@ static int ethernet_phy_detect(struct pxa168_private *mp)
 		val |= tmp;
 
 		if ((val & 0xfffffff0) != 0) {
-			/* printk(KERN_INFO "PHY found at addr %x\n",
-				mp->phy_addr); */
+			printk(KERN_INFO "PHY found at addr %x\n",
+				mp->phy_addr);
 			return 0;
 		}
 
@@ -1175,12 +1183,21 @@ static int setPortConfigExt(struct pxa168_private *mp, int mtu)
 		mtuSize = PCXR_MFL_64K;
 
 	/* Extended Port Configuration */
-	wrl(mp, PORT_CONFIG_EXT,
+	if(nophy) {
+		wrl(mp, PORT_CONFIG_EXT,
+			PCXR_2BSM | /* Two byte suffix aligns IP hdr */
+			PCXR_DSCP_EN |	/* Enable DSCP in IP */
+			mtuSize |
+			PCXR_FORCE_100M_FD |
+			PCXR_TX_HIGH_PRI); /* Transmit - high priority queue */
+	} else {
+		wrl(mp, PORT_CONFIG_EXT,
 			PCXR_2BSM | /* Two byte suffix aligns IP hdr */
 			PCXR_DSCP_EN |	/* Enable DSCP in IP */
 			mtuSize |
 			PCXR_FLP |	/* do not force link pass */
 			PCXR_TX_HIGH_PRI); /* Transmit - high priority queue */
+	}
 
 	/* subtract source/dest mac addr (12) + pid (2) + crc (4) */
 	mtu -= ETH_EXTRA_HEADER;
@@ -1193,7 +1210,8 @@ static void pxa168_init_hw(struct pxa168_private *mp)
 {
 	if (mp->pd != NULL) {
 		mp->pd->init();
-		ethernet_phy_set(mp);
+		if(!nophy)
+			ethernet_phy_set(mp);
 	}
 
 	/* Disable interrupts */
@@ -1220,7 +1238,10 @@ static void pxa168_init_hw(struct pxa168_private *mp)
 			SDCR_RC_MAX_RETRANS); /* Max retransmit count */
 
 	/* Port Configuration */
-	wrl(mp, PORT_CONFIG, PCR_HS);	/* Hash size is 1/2kb */
+	if(nophy)
+		wrl(mp, PORT_CONFIG, PCR_HS|PCR_HD);
+	else
+		wrl(mp, PORT_CONFIG, PCR_HS);	/* Hash size is 1/2kb */
 
 	setPortConfigExt(mp, (mp->dev)->mtu);
 }
@@ -1390,9 +1411,11 @@ static int pxa168_eth_open(struct net_device *dev)
 	pxa168_eth_set_rx_mode(dev);
 	mp->rx_resource_err = 0;
 
-	err = ethernet_phy_setup(dev);
-	if (err)
-		return -EAGAIN;
+	if(!nophy) {
+		err = ethernet_phy_setup(dev);
+		if (err)
+			return -EAGAIN;
+	}
 
 	memset(&mp->timeout, 0, sizeof(struct timer_list));
 	mp->timeout.function = rxq_refill_timer_wrapper;
@@ -1733,6 +1756,15 @@ static int pxa168_mdio_read(struct net_device *dev,
 	int val;
 	struct pxa168_private *mp = netdev_priv(dev);
 
+	if(nophy) {
+		switch (location) {
+			case 0: return 0x3100;
+			case 1: return 0x782d;
+			case 3: return 0x1e1;
+			case 5: return 0xc5e1;
+		}
+	}
+
 	eth_port_read_smi_reg(mp, location, &val);
 	return val;
 }
@@ -1774,6 +1806,7 @@ static int ethernet_phy_setup(struct net_device *dev)
 	int duplex = DUPLEX_FULL;
 	struct pxa168_private *mp = netdev_priv(dev);
 	struct ethtool_cmd cmd;
+	if(nophy) speed = SPEED_100;
 
 	err = ethernet_phy_detect(mp);
 	if (err) {
@@ -1877,8 +1910,18 @@ static int pxa168_eth_probe(struct platform_device *pdev)
 	int err;
 	int duplex = DUPLEX_FULL;
 	int speed = 0;			/* default to auto-negotiation */
+	volatile unsigned long *syscon;
+	u16 model;
 
 	printk(KERN_NOTICE "PXA168 10/100 Ethernet Driver\n");
+	syscon = ioremap(0x80004000, 0x1000);
+	model = ioread16(syscon);
+	printk("pxa168: model 0x%X\n", model);
+	if(model == 0x4712) {
+		nophy = 1;
+		printk(KERN_INFO "pxa168: disabling phy\n");
+	}
+	iounmap(syscon);
 
 	/* enable MFU clock  */
 	clk = clk_get(&pdev->dev, "MFUCLK");
