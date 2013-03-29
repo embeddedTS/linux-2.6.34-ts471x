@@ -1780,7 +1780,7 @@ config FB_68328
 
 config FB_PXA168
 	tristate "PXA168/910 LCD framebuffer support"
-	depends on FB && (CPU_PXA168 || CPU_PXA910)
+	depends on FB && (CPU_PXA168 || CPU_PXA910) && ! MACH_TS47XX
 	select FB_CFB_FILLRECT
 	select FB_CFB_COPYAREA
 	select FB_CFB_IMAGEBLIT
@@ -1788,6 +1788,24 @@ config FB_PXA168
 	  Frame buffer driver for the built-in LCD controller in the Marvell
 	  MMP processor.
 
+config FB_PXA168_OLD
+     tristate "PXA168 LCD framebuffer support"
+     depends on FB && CPU_PXA168 && MACH_TS47XX
+     select FB_CFB_FILLRECT
+     select FB_CFB_COPYAREA
+     select FB_CFB_IMAGEBLIT
+     ---help---
+       Frame buffer driver for the built-in LCD controller in the Marvell
+       MMP processor.  Uses the old driver from 2.6.29 for the TS47XX boards.
+       There will be two frame-buffer devices, one for the graphics layer,
+       and another for the video-overlay layer.
+
+       Requires a pair of device nodes.  Create them like so...
+
+         mknod /dev/fb0 c 29 0
+         mknod /dev/fb1 c 29 1
+	  
+	  
 config FB_PXA
 	tristate "PXA LCD framebuffer support"
 	depends on FB && ARCH_PXA

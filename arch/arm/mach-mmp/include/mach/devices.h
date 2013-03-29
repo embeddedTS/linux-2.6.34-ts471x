@@ -111,6 +111,8 @@ extern struct pxa_device_desc pxa168_device_msp;
 extern struct pxa_device_desc pxa168_device_cf;
 extern struct pxa_device_desc pxa168_device_icr;
 
+extern struct pxa_device_desc pxa168_device_tslcd;
+
 /*PXA910 Specific*/
 extern struct platform_device pxa910_device_acipc;
 extern struct pxa_device_desc pxa910_device_ire;

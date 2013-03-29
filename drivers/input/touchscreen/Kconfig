@@ -588,6 +588,16 @@ config TOUCHSCREEN_SANREMO
 	help
 	  Say Y here to enable support for the Sanremo touchscreen controller.
 
+config TOUCHSCREEN_TSLCD
+   tristate "TS-LCD"
+   help
+      Say Y here if you have the TS-LCD
+ 
+      If unsure, say N.
+ 
+      To compile this driver as a module, choose M here: the
+      module will be called tslcd.
+	  	  
 config TOUCHSCREEN_TPO
 	bool "TPO Touchscreen interface support"
 	depends on I2C && I2C_PXA

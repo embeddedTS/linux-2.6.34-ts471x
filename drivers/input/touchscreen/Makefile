@@ -51,3 +51,4 @@ obj-$(CONFIG_TOUCHSCREEN_TPO)		+= tpo_touch.o
 obj-$(CONFIG_TOUCHSCREEN_MICCO)		+= micco_touch.o
 obj-$(CONFIG_TOUCHSCREEN_WM97XX_ZYLONITE)	+= zylonite-wm97xx.o
 obj-$(CONFIG_TOUCHSCREEN_W90X900)	+= w90p910_ts.o
+obj-$(CONFIG_TOUCHSCREEN_TSLCD)       += ts_lcd.o

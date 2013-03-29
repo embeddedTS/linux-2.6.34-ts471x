@@ -106,6 +106,8 @@ PXA168_DEVICE(ov529, "pxa168-ov529", -1, NONE, SMC_CS0_PHYS_BASE, 0x100);
 PXA168_DEVICE(msp, "pxa168-msp", -1, MSP, 0xd4286000, 0x0FFF);
 PXA168_DEVICE(icr, "pxa168-icr", -1, ICR, 0xC0802000, 0x1000);
 
+PXA168_DEVICE(tslcd, "tslcd-touch", -1, NONE, 0, 0);
+
 /*PXA910 Specific*/
 PXA910_DEVICE(uart1, "pxa2xx-uart", 0, UART1, 0xd4017000, 0x30, 21, 22);
 PXA910_DEVICE(uart2, "pxa2xx-uart", 1, UART2, 0xd4018000, 0x30, 23, 24);

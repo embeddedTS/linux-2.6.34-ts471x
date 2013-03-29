@@ -366,67 +366,6 @@ typedef enum{
 	SW_TW9907  = 0x04,
 } SW_TYPE_T;
 
-static int ts4700_pinmux_switch(SW_TYPE_T type)
-{
-	int ret = 0;
-
-   //printk(KERN_ERR "%s %d: ts4700_pinmux_switch() not useful on ts4700\n", __FILE__, __LINE__);
-   return 0;
-#if (0)
-	if (gpio_request(CARD_EN, "CARD_EN")) {
-		printk(KERN_ERR "%s %d: Request GPIO failed,"
-				"gpio: %d \n", __FILE__, __LINE__, CARD_EN);
-		return -EIO;
-	}
-
-	if (gpio_request(CAM_PWDN, "CAM_PWDN")) {
-		gpio_free(CARD_EN);
-		printk(KERN_ERR "%s %d: Request GPIO failed,"
-				"gpio: %d\n", __FILE__, __LINE__, CAM_PWDN);
-		return -EIO;
-	}
-
-	if (gpio_request(TW9907_PWDN, "TW9907_PWDN")) {
-		gpio_free(CARD_EN);
-		gpio_free(CAM_PWDN);
-		printk(KERN_ERR "%s %d Request GPIO failed,"
-				"gpio: %d\n", __FILE__, __LINE__, TW9907_PWDN);
-		return -EIO;
-	}
-
-	switch (type) {
-	case SW_CARD:
-		gpio_direction_output(CARD_EN, 1);
-		gpio_direction_output(CAM_PWDN, 1);
-		gpio_direction_output(TW9907_PWDN, 1);
-		break;
-	case SW_CAM_ON:
-		gpio_direction_output(CARD_EN, 0);
-		gpio_direction_output(CAM_PWDN, 0);
-		gpio_direction_output(TW9907_PWDN, 1);
-		break;
-	case SW_CAM_OFF:
-		gpio_direction_output(CARD_EN, 0);
-		gpio_direction_output(CAM_PWDN, 1);
-		gpio_direction_output(TW9907_PWDN, 1);
-		break;
-	case SW_TW9907:
-		gpio_direction_output(CARD_EN, 0);
-		gpio_direction_output(CAM_PWDN, 1);
-		gpio_direction_output(TW9907_PWDN, 0);
-		break;
-	default:
-		ret = -EIO;
-		break;
-	}
-
-	gpio_free(CARD_EN);
-	gpio_free(CAM_PWDN);
-	gpio_free(TW9907_PWDN);
-
-	return ret;
-#endif
-}
 
 #if defined(CONFIG_PXA168_MSP)
 /* msp platform data */
@@ -795,163 +734,95 @@ struct platform_device pxa168_device_cir = {
 #endif
 
 
-
-static struct fb_videomode video_modes_ts4700[] = {
-	/* lpj032l001b HVGA mode info */
-
-      
-      [0] = {
-                .pixclock       = 33260,
-                .refresh        = 60,
-                .xres           = 800,
-                .yres           = 480,
-                .hsync_len      = 50,
-                .left_margin    = 50,
-                .right_margin   = 70,
-                .vsync_len      = 50,
-                .upper_margin   = 0,
-                .lower_margin   = 0,
-                .sync           = FB_SYNC_VERT_HIGH_ACT | FB_SYNC_HOR_HIGH_ACT,
-        },
-    
-        
-        [1] = {    /* For the 800x600 Hantronix LCD */
-                .pixclock       = 25000,
-                .refresh        = 60,
-                .xres           = 800,
-                .yres           = 600,
-                .hsync_len      = 50,
-                .left_margin    = 50,
-                .right_margin   = 70,
-                .vsync_len      = 50,
-                .upper_margin   = 0,
-                .lower_margin   = 0,
-                .sync           = FB_SYNC_VERT_HIGH_ACT | FB_SYNC_HOR_HIGH_ACT,
-        },
-
-        [2] = {
-                .pixclock       = 25641,
-                .refresh        = 60,
-                .xres           = 800,
-                .yres           = 600,
-                .hsync_len      = 128,
-                .left_margin    = 88,
-                .right_margin   = 40,
-                .vsync_len      = 4,
-                .upper_margin   = 23,
-                .lower_margin   = 1,
-                .sync           = 0,
-        },
-
-        [3] = {
-                .pixclock       = 111111,
-                .refresh        = 60,
-                .xres           = 480,
-                .yres           = 272,
-                .hsync_len      = 1,
-                .left_margin    = 43,
-                .right_margin   = 2,
-                .vsync_len      = 1,
-                .upper_margin   = 12,
-                .lower_margin   = 2,
-                .sync           = 0,
-        },
-
-        [4] = {
-                .pixclock       = 16129,
-                .refresh        = 60,
-                .xres           = 1280,
-                .yres           = 720,
-                .hsync_len      = 40,
-                .left_margin    = 220,
-                .right_margin   = 110,
-                .vsync_len      = 5,
-                .upper_margin   = 20,
-                .lower_margin   = 5,
-                .sync           = 0,
-        },
-
-        [5] = {
-                .pixclock       = 39722,
-                .refresh        = 60,
-                .xres           = 640,
-                .yres           = 480,
-                .hsync_len      = 96,
-                .left_margin    = 40,
-                .right_margin   = 8,
-                .vsync_len      = 2,
-                .upper_margin   = 25,
-                .lower_margin   = 2,
-                .sync           = 0,
-        },
-
-        [6] = {
-                .pixclock       = 18422,
-                .refresh        = 60,
-                .xres           = 1024,
-                .yres           = 600,
-                .hsync_len      = 381,
-                .left_margin    = 0,
-                .right_margin   = 0,
-                .vsync_len      = 50,
-                .upper_margin   = 0,
-                .lower_margin   = 0,
-                .sync           = 2,
-        },
-
-      [7] = {
-                .pixclock       = 154000,
-                .refresh        = 60,
-                .xres           = 320,
-                .yres           = 240,
-                .hsync_len      = 0,
-                .left_margin    = 68,
-                .right_margin   = 20,
-                .vsync_len      = 0,
-                .upper_margin   = 0,
-                .lower_margin   = 0,
-                .sync           = 0,
-        },
-             
+#if (defined(CONFIG_FB_PXA168) || defined(CONFIG_FB_PXA168_MODULE) || defined(CONFIG_FB_PXA168_OLD) || defined(CONFIG_FB_PXA168_OLD_MODULE))
+static struct fb_videomode video_modes[] = {  	   	
+   
+   [0] = {     /* For the 7-inch 800x480 Okaya LCD RV800480T */
+      .pixclock       = 30066,  /* DCLK Typ: 33.26MHz */
+      .refresh        = 60,
+      .xres           = 800,
+      .yres           = 480,
+      .hsync_len      = 50,
+      .left_margin    = 50,
+      .right_margin   = 70,
+      .vsync_len      = 50,
+      .upper_margin   = 0,
+      .lower_margin   = 0,
+      .sync           = FB_SYNC_VERT_HIGH_ACT | FB_SYNC_HOR_HIGH_ACT,
+   },
+   [1] = {     /* For the 10.4-inch 800x600 Hantronix LCD */
+      .pixclock       = 25000,   /* tLVCP Typ: 25ns */
+      .refresh        = 60,
+      .xres           = 800,
+      .yres           = 600,
+      .hsync_len      = 50,
+      .left_margin    = 50,
+      .right_margin   = 70,
+      .vsync_len      = 50,
+      .upper_margin   = 0,
+      .lower_margin   = 0,
+      .sync           = FB_SYNC_VERT_HIGH_ACT | FB_SYNC_HOR_HIGH_ACT,
+   },
 };
+#endif
 
-/* SPI Control Register. */
-#define     CFG_SCLKCNT(div)                    (div<<24)  /* 0xFF~0x2 */
-#define     CFG_RXBITS(rx)                      ((rx - 1)<<16)   /* 0x1F~0x1 */
-#define     CFG_TXBITS(tx)                      ((tx - 1)<<8)    /* 0x1F~0x1, 0x1: 2bits ... 0x1F: 32bits */
-#define     CFG_SPI_ENA(spi)                    (spi<<3)
-#define     CFG_SPI_SEL(spi)                    (spi<<2)   /* 1: port1; 0: port0 */
-#define     CFG_SPI_3W4WB(wire)                 (wire<<1)  /* 1: 3-wire; 0: 4-wire */
 
+#if (defined(CONFIG_FB_PXA168_OLD) || defined(CONFIG_FB_PXA168_OLD_MODULE))
+/* Use the old Marvell-supplied video driver from 2.6.29 */
 struct pxa168fb_mach_info ts4700_lcd_info __initdata = {
-	.id                     = "Base-ts4700",
-	.modes                  = video_modes_ts4700,
-	.num_modes              = ARRAY_SIZE(video_modes_ts4700),
+	.id                     = "Graphic Frame",
+	.modes                  = video_modes,
+	.num_modes              = ARRAY_SIZE(video_modes),
 	.pix_fmt                = PIX_FMT_RGB565,
 	.io_pin_allocation_mode = PIN_MODE_DUMB_24,
 	.dumb_mode              = DUMB_MODE_RGB888,
-	.active                 = 7,
-	.spi_ctrl		= CFG_SCLKCNT(2) | CFG_TXBITS(16) | CFG_SPI_SEL(1) | CFG_SPI_3W4WB(1) | CFG_SPI_ENA(1),
-	.spi_gpio_cs		= GPIO_EXT1(14),
-	.spi_gpio_reset         = -1,
+	.active                 = 1,
 	.panel_rbswap		= 1,
 	.pxa168fb_lcd_power     = NULL, //tpo_lcd_power,
-	.max_fb_size		= 1024 * 768 * 4 * 2,
+	.max_fb_size		= 800 * 600 * 4 * 2,
 	.invert_pixclock        = 0,
 };
 
 struct pxa168fb_mach_info ts4700_lcd_ovly_info __initdata = {
-	.id                     = "Ovly-ts4700",
-	.modes                  = video_modes_ts4700,
-	.num_modes              = ARRAY_SIZE(video_modes_ts4700),
+	.id                     = "Graphic Ovly",
+	.modes                  = video_modes,
+	.num_modes              = ARRAY_SIZE(video_modes),
 	.pix_fmt                = PIX_FMT_RGB565,
 	.io_pin_allocation_mode = PIN_MODE_DUMB_24,
 	.dumb_mode              = DUMB_MODE_RGB888,
-	.active                 = 7,
+	.active                 = 1,
 	.panel_rbswap		= 1,
-	.max_fb_size		= 1024 * 768 * 4 * 2,
+	.max_fb_size		= 800 * 600 * 4 * 2,
 	.invert_pixclock        = 0,
 };
+
+#elif (defined(CONFIG_FB_PXA168) || defined(CONFIG_FB_PXA168_MODULE))
+struct pxa168fb_mach_info ts4700_lcd_info __initdata = {
+	.id                     = "Graphic Frame",
+	.modes                  = video_modes,
+	.num_modes              = ARRAY_SIZE(video_modes),
+	.pix_fmt                = PIX_FMT_RGB565,
+	.io_pin_allocation_mode = PIN_MODE_DUMB_24,
+	.dumb_mode              = DUMB_MODE_RGB888,
+	.active                 = 1,
+	.panel_rbswap		= 0,
+	.invert_pixclock        = 0,		
+	.panel_rgb_reverse_lanes = 0,
+	.invert_pix_val_ena = 0,
+};
+
+struct pxa168fb_mach_info ts4700_lcd_ovly_info __initdata = {
+	.id                     = "Graphic Ovly",
+	.modes                  = video_modes,
+	.num_modes              = ARRAY_SIZE(video_modes),
+	.pix_fmt                = PIX_FMT_RGB565,
+	.io_pin_allocation_mode = PIN_MODE_DUMB_24,
+	.dumb_mode              = DUMB_MODE_RGB888,
+	.active                 = 1,
+	.panel_rbswap		       = 1,
+	.invert_pixclock        = 0,
+};
+#endif
 
 
 static struct i2c_board_info pwri2c_board_info[] = {
@@ -1207,6 +1078,7 @@ static void __init ts4700_init(void)
    case 2:  printk("TS-8390\n"); break;
    case 10: printk("TS-8900\n"); break;
    case 11: printk("TS-8290\n"); break;
+   case 15: printk("TS-8380\n"); break;      
    default: printk("Unknown\n");
    }
 
@@ -1217,6 +1089,7 @@ static void __init ts4700_init(void)
    case 2:     /* TS-8390 */
    case 5:
    case 11:    /* TS-8290 */
+   case 15:    /* TS-8380 */      
       baseboardHasLCD = 1;
       break;
    default:
@@ -1254,6 +1127,11 @@ static void __init ts4700_init(void)
 	if (baseboardHasLCD) {
 	   pxa168_add_fb(&ts4700_lcd_info);
 	   pxa168_add_fb_ovly(&ts4700_lcd_ovly_info);
+	   
+#if (defined(CONFIG_TOUCHSCREEN_TSLCD) || defined(CONFIG_TOUCHSCREEN_TSLCD_MODULE))	   
+	   pxa_register_device(&pxa168_device_tslcd, 0, 0); 
+#endif	   
+	   
 	}
 
 	ts4700_create_proc_irq();
