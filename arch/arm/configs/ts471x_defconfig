@@ -1,7 +1,7 @@
 #
 # Automatically generated make config: don't edit
 # Linux kernel version: 2.6.34
-# Fri Mar  1 09:25:48 2013
+# Tue Apr  2 11:11:53 2013
 #
 CONFIG_ARM=y
 CONFIG_SYS_SUPPORTS_APM_EMULATION=y
@@ -300,6 +300,7 @@ CONFIG_FORCE_MAX_ZONEORDER=15
 #
 # Bus support
 #
+CONFIG_ISA=y
 # CONFIG_PCI is not set
 # CONFIG_PCI_SYSCALL is not set
 # CONFIG_ARCH_SUPPORTS_MSI is not set
@@ -481,6 +482,7 @@ CONFIG_EXTRA_FIRMWARE=""
 # CONFIG_CONNECTOR is not set
 # CONFIG_MTD is not set
 # CONFIG_PARPORT is not set
+# CONFIG_PNP is not set
 CONFIG_BLK_DEV=y
 # CONFIG_BLK_DEV_COW_COMMON is not set
 # CONFIG_BLK_DEV_LOOP is not set
@@ -554,8 +556,21 @@ CONFIG_SCSI_WAIT_SCAN=m
 # CONFIG_SCSI_SRP_ATTRS is not set
 CONFIG_SCSI_LOWLEVEL=y
 # CONFIG_ISCSI_TCP is not set
+# CONFIG_SCSI_AHA152X is not set
+# CONFIG_SCSI_AIC7XXX_OLD is not set
+# CONFIG_SCSI_ADVANSYS is not set
+# CONFIG_SCSI_IN2000 is not set
 # CONFIG_LIBFC is not set
 # CONFIG_LIBFCOE is not set
+# CONFIG_SCSI_DTC3280 is not set
+# CONFIG_SCSI_FUTURE_DOMAIN is not set
+# CONFIG_SCSI_GENERIC_NCR5380 is not set
+# CONFIG_SCSI_GENERIC_NCR5380_MMIO is not set
+# CONFIG_SCSI_NCR53C406A is not set
+# CONFIG_SCSI_PAS16 is not set
+# CONFIG_SCSI_QLOGIC_FAS is not set
+# CONFIG_SCSI_SYM53C416 is not set
+# CONFIG_SCSI_T128 is not set
 # CONFIG_SCSI_DEBUG is not set
 # CONFIG_SCSI_DH is not set
 # CONFIG_SCSI_OSD_INITIATOR is not set
@@ -568,6 +583,7 @@ CONFIG_NETDEVICES=y
 # CONFIG_EQUALIZER is not set
 # CONFIG_TUN is not set
 # CONFIG_VETH is not set
+# CONFIG_ARCNET is not set
 CONFIG_PHYLIB=y
 
 #
@@ -592,13 +608,20 @@ CONFIG_PHYLIB=y
 CONFIG_NET_ETHERNET=y
 CONFIG_MII=y
 # CONFIG_AX88796 is not set
+# CONFIG_NET_VENDOR_3COM is not set
+# CONFIG_NET_VENDOR_SMC is not set
 # CONFIG_SMC91X is not set
 CONFIG_PXA168_ETH=y
 # CONFIG_DM9000 is not set
 # CONFIG_ETHOC is not set
 # CONFIG_SMC911X is not set
 # CONFIG_SMSC911X is not set
+# CONFIG_NET_VENDOR_RACAL is not set
 # CONFIG_DNET is not set
+# CONFIG_AT1700 is not set
+# CONFIG_DEPCA is not set
+# CONFIG_HP100 is not set
+# CONFIG_NET_ISA is not set
 # CONFIG_IBM_NEW_EMAC_ZMII is not set
 # CONFIG_IBM_NEW_EMAC_RGMII is not set
 # CONFIG_IBM_NEW_EMAC_TAH is not set
@@ -606,11 +629,14 @@ CONFIG_PXA168_ETH=y
 # CONFIG_IBM_NEW_EMAC_NO_FLOW_CTRL is not set
 # CONFIG_IBM_NEW_EMAC_MAL_CLR_ICINTSTAT is not set
 # CONFIG_IBM_NEW_EMAC_MAL_COMMON_ERR is not set
+# CONFIG_NET_PCI is not set
 # CONFIG_B44 is not set
+# CONFIG_CS89x0 is not set
 # CONFIG_KS8842 is not set
 # CONFIG_KS8851_MLL is not set
 # CONFIG_NETDEV_1000 is not set
 # CONFIG_NETDEV_10000 is not set
+# CONFIG_TR is not set
 # CONFIG_WLAN is not set
 
 #
@@ -717,9 +743,11 @@ CONFIG_UNIX98_PTYS=y
 # CONFIG_LEGACY_PTYS is not set
 # CONFIG_IPMI_HANDLER is not set
 # CONFIG_HW_RANDOM is not set
+# CONFIG_DTLK is not set
 # CONFIG_R3964 is not set
 # CONFIG_RAW_DRIVER is not set
 # CONFIG_TCG_TPM is not set
+CONFIG_DEVPORT=y
 # CONFIG_DCC_TTY is not set
 
 #
@@ -813,7 +841,7 @@ CONFIG_FB_CFB_IMAGEBLIT=m
 # Frame buffer hardware drivers
 #
 # CONFIG_FB_S1D13XXX is not set
-CONFIG_FB_PXA168=m
+CONFIG_FB_PXA168_OLD=m
 # CONFIG_FB_VIRTUAL is not set
 # CONFIG_FB_METRONOME is not set
 # CONFIG_FB_MB862XX is not set
