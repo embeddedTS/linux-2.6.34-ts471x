@@ -53,17 +53,14 @@ static void mux_irq_handler(unsigned int irq, struct irq_desc *desc)
     */
 
     /* Why do we need to do this before handling interrupts?  */
-    ICU_INT_CONF(0xfc) &= ~0xF;  /* Mask the SMC_IRQ */
+   ICU_INT_CONF(0xfc) &= ~0xF;  /* Mask the SMC_IRQ */
     
-   while((fpga_irq_reg = FPGA_REG(FPGA_IRQ_OFFSET))) {
+   fpga_irq_reg = FPGA_REG(FPGA_IRQ_OFFSET);
       for(n=0,bit=1; bit < 0x8000; bit <<= 1, n++)  {
          if(fpga_irq_reg & bit)            
             generic_handle_irq(MIN_FPGA_IRQ + n);         
       }
-   }
-
-   
-   //ICU_INT_CONF(0xfc) &= ~0xF;     /* Mask the SMC_IRQ */
+     
 }
 
 /**
