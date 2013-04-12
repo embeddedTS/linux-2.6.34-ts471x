@@ -1020,7 +1020,9 @@ void ts4700_restart(char mode, const char *cmd)
 	volatile unsigned short *syscon;
 	syscon = ioremap(0x80004000, 0x1000);
 	syscon[6/2] = 0x0; // Set the watchdog to 0.338s
-	while(1){};
+	while(1){
+		barrier();
+	};
 }
 
 static void __init ts4700_init(void)

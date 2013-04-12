@@ -34,7 +34,6 @@
  */
 
 #include <linux/module.h>
-#include <linux/platform_device.h>
 #include <linux/moduleparam.h>
 #include <linux/kernel.h>
 #include <linux/init.h>
@@ -299,15 +298,14 @@ static int load_calibration(volatile unsigned short *gpio,
 
 
 
-static int tslcd_probe(struct platform_device *pdev)
+
+static int __init tslcd_init(void)
 {
   int err;
   int gpioBase;
   unsigned int baseboard;
   volatile unsigned short *vreg;
 
-  printk("%s\n", __func__);
-  
   vreg = ioremap(0x80004000,5*4096);
   if (vreg == 0) {
     printk("tslcd: could not get touchscreen regs\n");
@@ -315,7 +313,7 @@ static int tslcd_probe(struct platform_device *pdev)
     goto fail1;
   }
 
-  baseboard = tsGetBaseBoard();
+   baseboard = tsGetBaseBoard();
 
   if (baseboard == 10) {    /* TS-8900 */
      printk("Baseboard: TS-8900\n");
@@ -325,24 +323,7 @@ static int tslcd_probe(struct platform_device *pdev)
      tX = vreg + 0x2040;
      tY = vreg + 0x2041;
   }
-  
-  else if (baseboard == 15)   {  /* TS-8380 */
-     printk("Baseboard: TS-8380, Touchscreen on SPI\n");
-     
-     /**
-      This baseboard has an AD7843 Touchscreen Digitizer, connected via SPI
-      to the fpga on the 47xx.
-     */
-          
-     gpioBase = 0x28;
-
-     vreg[1] &= ~BIT(14);     /* Disable the Touchscreen core in the fpga (at 0x80004002) */
-     vreg[1] |= BIT(10);      /* Enable the SPI core in the fpga (at 0x80004002) */
-     
-     tX = vreg + 0x800;
-     tY = vreg + 0x801;
-     
-  } else {
+  else {
 
      gpioBase = 0x28;
      vreg[1] |= BIT(14);      /* Enable the Touchscreen core in the fpga (at 0x80004002) */
@@ -380,9 +361,15 @@ static int tslcd_probe(struct platform_device *pdev)
   }
 
   tslcd_dev->name = "TS-LCD";
-  tslcd_dev->phys = "tslcd/input0";      
+  tslcd_dev->phys = "tslcd/input0";
+  //tslcd_dev->id.bustype = BUS_ISA;
+  //tslcd_dev->id.vendor  = 0x0005;
+  //tslcd_dev->id.product = 0x0001;
+  //tslcd_dev->id.version = 0x0100;
+
   tslcd_dev->open    = tslcd_open;
   tslcd_dev->close   = tslcd_close;
+
 
   tslcd_dev->evbit[0] = BIT_MASK(EV_KEY) | BIT_MASK(EV_ABS);
 
@@ -404,37 +391,13 @@ static int tslcd_probe(struct platform_device *pdev)
   return err;
 }
 
-
-static int tslcd_remove(struct platform_device *pdev)
-{   
-	input_unregister_device(tslcd_dev);
-
-	return 0;
-}
-
-
-
-static struct platform_driver tslcd_driver = {
-	.driver = {
-		.name 	= "tslcd-touch",
-	},
-	.probe		= tslcd_probe,
-	.remove		= tslcd_remove,
-};
-
-static int __init tslcd_init(void)
-{     
-  return platform_driver_probe(&tslcd_driver, tslcd_probe);   
-}
-
 static void __exit tslcd_exit(void)
 {
-	platform_driver_unregister(&tslcd_driver);
+  input_unregister_device(tslcd_dev);
 }
 
 module_init(tslcd_init);
 module_exit(tslcd_exit);
-
 module_param(swapxy,bool, 0644);
 module_param(negx,bool, 0644);
 module_param(negy,bool, 0644);
@@ -470,5 +433,3 @@ module_param(qcalib_xlr, uint, 0644);
 MODULE_PARM_DESC(qcalib_xlr,"qcalib_xlr");
 module_param(qcalib_ylr, uint, 0644);
 MODULE_PARM_DESC(qcalib_ylr,"qcalib_ylr");
-
-MODULE_LICENSE("GPL");

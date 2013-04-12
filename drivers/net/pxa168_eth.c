@@ -1411,11 +1411,10 @@ static int pxa168_eth_open(struct net_device *dev)
 	pxa168_eth_set_rx_mode(dev);
 	mp->rx_resource_err = 0;
 
-	if(!nophy) {
-		err = ethernet_phy_setup(dev);
-		if (err)
-			return -EAGAIN;
-	}
+	err = ethernet_phy_setup(dev);
+	if (err)
+		return -EAGAIN;
+
 
 	memset(&mp->timeout, 0, sizeof(struct timer_list));
 	mp->timeout.function = rxq_refill_timer_wrapper;
@@ -1806,24 +1805,26 @@ static int ethernet_phy_setup(struct net_device *dev)
 	int duplex = DUPLEX_FULL;
 	struct pxa168_private *mp = netdev_priv(dev);
 	struct ethtool_cmd cmd;
-	if(nophy) speed = SPEED_100;
+	if(nophy) {
+		speed = SPEED_100;
+	} else {
+		err = ethernet_phy_detect(mp);
+		if (err) {
+			printk(KERN_INFO "pxa168 ethernet port %d: "
+					"No PHY detected at addr %d\n",
+					mp->port_num, ethernet_phy_get(mp));
+			return err;
+		}
 
-	err = ethernet_phy_detect(mp);
-	if (err) {
-		printk(KERN_INFO "pxa168 ethernet port %d: "
-				"No PHY detected at addr %d\n",
-				mp->port_num, ethernet_phy_get(mp));
-		return err;
+		/* if no mac address assigned -- generate one */
+		if (memcmp (dev->dev_addr, pxa168_mac_str, sizeof(pxa168_mac_str)) == 0) {
+			memcpy(dev->dev_addr, MarvellOUI, sizeof(MarvellOUI));
+			dev->dev_addr[0] |= (1<<6);  /* set locally admin bit */
+			get_random_bytes(&dev->dev_addr[3], 3);
+		}
+
+		ethernet_phy_reset(mp);
 	}
-
-	/* if no mac address assigned -- generate one */
-	if (memcmp (dev->dev_addr, pxa168_mac_str, sizeof(pxa168_mac_str)) == 0) {
-		memcpy(dev->dev_addr, MarvellOUI, sizeof(MarvellOUI));
-		dev->dev_addr[0] |= (1<<6);  /* set locally admin bit */
-		get_random_bytes(&dev->dev_addr[3], 3);
-	}
-
-	ethernet_phy_reset(mp);
 	pxa168_init_ethtool_cmd(dev, mp->mii.phy_id, speed, duplex, &cmd);
 	pxa168_set_settings(dev, &cmd);
 	update_hash_table_mac_address(mp, dev->dev_addr, dev->dev_addr);
