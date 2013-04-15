@@ -21,7 +21,7 @@
 #include <linux/usb.h>
 #include <linux/usb/otg.h>
 #include <plat/pxa_u2o.h>
-
+#include <linux/pci.h>
 #include <asm/mach-types.h>
 #include <asm/mach/arch.h>
 #include <mach/addr-map.h>
@@ -278,7 +278,7 @@ static struct pxa168_eth_platform_data pxa168_eth_data = {
 	.init		= pxa168_eth_init,
 };
 
-#if defined(CONFIG_PCI)
+#if defined(CONFIG_PCI) || defined(CONFIG_PCI_TS47XX)
 
 #define PCIE_1P5V_SHDN_N GPIO_EXT2(1)
 #define PCIE_3P3V_SHDN_N GPIO_EXT2(2)
@@ -1023,6 +1023,19 @@ void ts4700_restart(char mode, const char *cmd)
 	while(1){};
 }
 
+
+static void __devinit i210_pci_fixup(struct pci_dev *dev)
+{
+
+   printk("%s\n", __func__);
+		dev->resource[2].start = 0;
+		dev->resource[2].end   = 0;
+		dev->resource[2].flags = 0;
+	
+}
+DECLARE_PCI_FIXUP_HEADER(PCI_VENDOR_ID_INTEL, 1532, i210_pci_fixup);
+
+
 static void __init ts4700_init(void)
 {
    int baseboardHasLCD;
@@ -1044,12 +1057,15 @@ static void __init ts4700_init(void)
       unsigned int i, x;
       volatile unsigned short *vreg;
 
-      vreg = ioremap(0x80004000,4096);
+      vreg = TS47XX_FPGA_VIRT_BASE; // ioremap(0x80004000,4096);
       if (vreg == 0)
          printk("ts4700_init: could not get fpga regs\n");
       else
       {
 
+         printk("vreg = 0x%08lX\n", vreg);
+         
+         
 #define peek16(adr) (vreg[(adr)/2])
 #define poke16(adr, val) (vreg[(adr)/2] = (val))
 
@@ -1075,7 +1091,7 @@ static void __init ts4700_init(void)
          poke16(0x1a, prev3);
          poke16(0x10, prev4);
 
-         iounmap(vreg);
+        // iounmap(vreg);
       }
    }
 
@@ -1093,7 +1109,9 @@ static void __init ts4700_init(void)
 
    switch(tsBaseBoard) {
    case 10:    /* TS-8900 */
+#if (defined(CONFIG_FB_PXA168_OLD) || defined(CONFIG_FB_PXA168_OLD_MODULE) || defined(CONFIG_FB_PXA168) || defined(CONFIG_FB_PXA168_MODULE))	      
       ts4700_lcd_info.invert_pixclock = 1;
+#endif      
    case 1:     /* TS-8395 */
    case 2:     /* TS-8390 */
    case 5:
@@ -1123,6 +1141,9 @@ static void __init ts4700_init(void)
 #ifdef CONFIG_USB_EHCI_PXA_U2H
  	pxa168_add_u2h(&ts4700_u2h_info);
 #endif
+#if defined(CONFIG_PCI) || defined(CONFIG_PCI_TS47XX) 
+	pxa168_add_pcie(&pxa168_pcie_data);
+#endif
 	pxa168_add_mfu(&pxa168_eth_data);
 #if defined(CONFIG_MMC_PXA_SDH)
 	pxa168_add_sdh(1, &ts4700_sdh_platform_data_MMC1);
@@ -1133,6 +1154,7 @@ static void __init ts4700_init(void)
 
 	pxa168_add_freq();
 	
+#if (defined(CONFIG_FB_PXA168_OLD) || defined(CONFIG_FB_PXA168_OLD_MODULE) || defined(CONFIG_FB_PXA168) || defined(CONFIG_FB_PXA168_MODULE))	
 	if (baseboardHasLCD) {
 	   pxa168_add_fb(&ts4700_lcd_info);
 	   pxa168_add_fb_ovly(&ts4700_lcd_ovly_info);
@@ -1140,15 +1162,16 @@ static void __init ts4700_init(void)
 #if (defined(CONFIG_TOUCHSCREEN_TSLCD) || defined(CONFIG_TOUCHSCREEN_TSLCD_MODULE))	   
 	   pxa_register_device(&pxa168_device_tslcd, 0, 0); 
 #endif	   
-	   
 	}
+#endif
+
 
 	ts4700_create_proc_irq();
 
 }
 
 
-MACHINE_START(TS47XX, "ts4700 board")
+MACHINE_START(TS47XX, "ts471x board")
 	.phys_io        = APB_PHYS_BASE,
 	.boot_params    = 0x00000100,
 	.io_pg_offst    = (APB_VIRT_BASE >> 18) & 0xfffc,
