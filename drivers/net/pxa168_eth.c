@@ -1914,14 +1914,14 @@ static int pxa168_eth_probe(struct platform_device *pdev)
 	u16 model;
 
 	printk(KERN_NOTICE "PXA168 10/100 Ethernet Driver\n");
-	syscon = ioremap(0x80004000, 0x1000);
+	syscon = 0xfe400000; //ioremap(0x80004000, 0x1000);
 	model = ioread16(syscon);
 	printk("pxa168: model 0x%X\n", model);
 	if(model == 0x4712) {
 		nophy = 1;
 		printk(KERN_INFO "pxa168: disabling phy\n");
 	}
-	iounmap(syscon);
+	//iounmap(syscon);
 
 	/* enable MFU clock  */
 	clk = clk_get(&pdev->dev, "MFUCLK");
