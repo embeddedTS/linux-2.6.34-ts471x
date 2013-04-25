@@ -2079,6 +2079,22 @@ config E1000
 	  To compile this driver as a module, choose M here. The module
 	  will be called e1000.
 
+	  
+config I210_GIGABIT
+	tristate "Intel(R) i210 Gigabit Ethernet support on TS-47XX"
+	depends on PCI && MACH_TS47XX
+	---help---
+	  This driver supports Intel(R) i210 gigabit ethernet device on 
+	  the TS-47XX range of boards (must have PXA168, not PXA166).
+	  
+	  For general information and support, go to the Intel support
+	  website at:
+
+	  <http://support.intel.com>
+	  
+	  To compile this driver as a module, choose M here. The module
+	  will be called igb.	  
+	  
 config E1000E
 	tristate "Intel(R) PRO/1000 PCI-Express Gigabit Ethernet support"
 	depends on PCI && (!SPARC32 || BROKEN)

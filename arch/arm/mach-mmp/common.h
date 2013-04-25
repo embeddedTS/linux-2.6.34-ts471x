@@ -21,3 +21,7 @@ extern void release_RIPC(void);
 extern void get_RIPC(void);
 extern struct mbus_dram_target_info pxa168_mbus_dram_info;
 extern void pxa168_setup_cpu_mbus(void);
+
+#if defined(CONFIG_PCI_TS47XX)
+extern void __init pxa168_pcie_init(void);
+#endif

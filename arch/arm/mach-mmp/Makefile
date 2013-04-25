@@ -31,6 +31,7 @@ obj-$(CONFIG_PM_PXA910)		+= pxa910_pm.o pxa910_pm_ll.o
 obj-$(CONFIG_TIMER_SERVICES_MMP)+= timer_services.o
 obj-$(CONFIG_MMC)		+= mmc.o
 obj-$(CONFIG_PCI)		+= pxa168_pcie.o
+obj-$(CONFIG_PCI_TS47XX)		+= pcie-old/
 obj-$(CONFIG_MACH_FLINT)	+= flint.o
 obj-$(CONFIG_MACH_MARVELL_JASPER) += jasper.o
 obj-$(CONFIG_MACH_TS47XX)	+= ts4700.o ts4700_mux_irq.o

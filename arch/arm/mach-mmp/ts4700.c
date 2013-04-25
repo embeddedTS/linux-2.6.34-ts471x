@@ -68,6 +68,13 @@ int tsGetBaseBoard(void)
 }
 EXPORT_SYMBOL(tsGetBaseBoard);
 
+
+static unsigned short model;
+int tsGetModel(void) {
+   return model;
+}
+EXPORT_SYMBOL(tsGetModel);
+
 extern void spi_flashinit(void);
 
 
@@ -379,12 +386,8 @@ static mfp_cfg_t mfp_cfg_msp[]  = {
 };
 
 static void mspro_mfp_config(void)
-{
-	int ret = 0;
-
-	ret = ts4700_pinmux_switch(SW_CARD);
-	if (0 == ret)
-		mfp_config(ARRAY_AND_SIZE(mfp_cfg_msp));
+{	
+	mfp_config(ARRAY_AND_SIZE(mfp_cfg_msp));
 }
 
 static struct card_platform_data msp_ops = {
@@ -418,12 +421,8 @@ static int sensor_power_onoff(int on, int unused)
 	 * on, 0, power off
 	 */
 	int ret = 0;
-	if(on){
-		ret = ts4700_pinmux_switch(SW_CAM_ON);
-	        if (0 == ret)
+	if(on){		
 			mfp_config(ARRAY_AND_SIZE(ts4700_cam_pins));
-	}else{
-		ret = ts4700_pinmux_switch(SW_CAM_OFF);
 	}
 	return ret;
 }
@@ -494,17 +493,27 @@ static mfp_cfg_t ts4700_sdh_pins[] = {
    MFP_CFG_DRV(GPIO31, AF6, FAST),
    MFP_CFG_DRV(GPIO30, AF6, FAST),
    MFP_CFG_DRV(GPIO28, AF6, FAST),
-   MFP_CFG_DRV(GPIO118, AF4, FAST)
+   MFP_CFG_DRV(GPIO118, AF4, FAST),
+   
+   GPIO26_GPIO
 };
 
 
 static void sdh_mfp_config(void)
-{
-	int ret = 0;
+{	   
+       
+	mfp_config(ARRAY_AND_SIZE(ts4700_sdh_pins));
 
-	ret = ts4700_pinmux_switch(SW_CARD);
-	if (0 == ret)
-		mfp_config(ARRAY_AND_SIZE(ts4700_sdh_pins));
+#if defined(CONFIG_TS47XX_OFFBOARD_MMC)
+	if ((model & 0x4710) == 0x4710) {
+	   volatile unsigned long *p = 
+	      (volatile unsigned long*)(APB_VIRT_BASE + 0x19000);
+	      
+	   /* Enable power to the offboard eMMC chip (471x, not 4700) */
+	   p[0x0c / 4] |= (1 << 26);
+	   p[0x24 / 4] = (1 << 26);
+	}
+#endif	
 }
 
 static struct pxasdh_platform_data ts4700_sdh_platform_data_MMC1 = {
@@ -1039,7 +1048,7 @@ DECLARE_PCI_FIXUP_HEADER(PCI_VENDOR_ID_INTEL, 1532, i210_pci_fixup);
 
 
 static void __init ts4700_init(void)
-{
+{   
    int baseboardHasLCD;
 	mfp_config(ARRAY_AND_SIZE(ts4700_pin_config));
 
@@ -1063,10 +1072,7 @@ static void __init ts4700_init(void)
       if (vreg == 0)
          printk("ts4700_init: could not get fpga regs\n");
       else
-      {
-
-         printk("vreg = 0x%08lX\n", vreg);
-         
+      {         
          
 #define peek16(adr) (vreg[(adr)/2])
 #define poke16(adr, val) (vreg[(adr)/2] = (val))
@@ -1094,11 +1100,15 @@ static void __init ts4700_init(void)
          poke16(0x10, prev4);
 
         // iounmap(vreg);
+        
+        model = peek16(0);
+        
       }
    }
 
    tsBaseBoard &= 0x3F;       /* Only lower 6 bits are model; upper 2 bits are Rev. */
 
+   printk("Model: 0x%04X\n", model);   
    printk("Baseboard: ");
    switch(tsBaseBoard) {
    case 1:  printk("TS-8395\n"); break;

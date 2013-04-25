@@ -34,6 +34,8 @@ obj-$(CONFIG_JME) += jme.o
 obj-$(CONFIG_BE2NET) += benet/
 obj-$(CONFIG_VMXNET3) += vmxnet3/
 
+obj-$(CONFIG_I210_GIGABIT) += i210/
+
 gianfar_driver-objs := gianfar.o \
 		gianfar_ethtool.o \
 		gianfar_sysfs.o

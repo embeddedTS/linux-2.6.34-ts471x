@@ -8,6 +8,8 @@
  * warranty of any kind, whether express or implied.
  */
 
+#if ! defined(CONFIG_PCI_TS47XX)
+ 
 #include <linux/kernel.h>
 #include <linux/pci.h>
 #include <linux/mbus.h>
@@ -209,6 +211,9 @@ pxa168_pcie_read_reg(void __iomem * base, u8 is_conf_read, u32 addr,
 	return val;
 }
 
+
+EXPORT_SYMBOL(pxa168_pcie_read_reg);
+
 static void pxa168_pcie_write_reg(void __iomem * base, u8 is_conf_write,
 				  u32 addr, u8 size, u32 val)
 {
@@ -298,6 +303,9 @@ static void pxa168_pcie_write_reg(void __iomem * base, u8 is_conf_write,
 	spin_unlock_irqrestore(&channel_lock[channel], flags);
 }
 
+EXPORT_SYMBOL(pxa168_pcie_write_reg);
+
+
 u8 pxa168_pcie_read8(u32 addr)
 {
 	return (u8) pxa168_pcie_read_reg(0, IO_MEM, addr, SIZE_8);
@@ -313,6 +321,11 @@ u32 pxa168_pcie_read32(u32 addr)
 	return pxa168_pcie_read_reg(0, IO_MEM, addr, SIZE_32);
 }
 
+EXPORT_SYMBOL(pxa168_pcie_read8);
+EXPORT_SYMBOL(pxa168_pcie_read16);
+EXPORT_SYMBOL(pxa168_pcie_read32);
+
+
 void pxa168_pcie_write8(u8 val, u32 addr)
 {
 	pxa168_pcie_write_reg(0, IO_MEM, addr, SIZE_8, (u32) val);
@@ -327,6 +340,11 @@ void pxa168_pcie_write32(u32 val, u32 addr)
 {
 	pxa168_pcie_write_reg(0, IO_MEM, addr, SIZE_32, val);
 }
+
+EXPORT_SYMBOL(pxa168_pcie_write8);
+EXPORT_SYMBOL(pxa168_pcie_write16);
+EXPORT_SYMBOL(pxa168_pcie_write32);
+
 
 static void pxa168_pcie_clk_enable(void)
 {
@@ -595,6 +613,7 @@ int pxa168_pcie_probe(struct platform_device *pdev)
 	struct pxa168_pcie_platform_data *pdata =
 		(struct pxa168_pcie_platform_data *)pdev->dev.platform_data;
 
+		
 	if (pdata->init == NULL)
 		return 0;
 
@@ -668,3 +687,4 @@ static int __init pxa168_pcie_init(void)
 }
 
 device_initcall(pxa168_pcie_init);
+#endif

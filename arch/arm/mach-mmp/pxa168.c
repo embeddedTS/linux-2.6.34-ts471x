@@ -29,6 +29,7 @@
 #include "common.h"
 #include "clock.h"
 
+
 #define MFPR_VIRT_BASE	(APB_VIRT_BASE + 0x1e000)
 
 static struct mfp_addr_map pxa168_mfp_addr_map[] __initdata =
@@ -343,3 +344,31 @@ static int __init pxa168_init(void)
 	return 0;
 }
 postcore_initcall(pxa168_init);
+
+
+
+/*****************************************************************************
+ * PCI
+ ****************************************************************************/
+#if defined(CONFIG_PCI) || defined(CONFIG_PCI_TS47XX) 
+
+static int __init pxa168_db_pci_init(void)
+{
+	pxa168_pcie_init();
+
+	return 0;
+}
+device_initcall(pxa168_db_pci_init);
+
+
+int arch_setup_msi_irq(struct pci_dev *dev, struct msi_desc *desc) {
+   return 0;
+}
+void arch_teardown_msi_irq(unsigned int irq) {
+   
+}
+
+#endif
+
+
+

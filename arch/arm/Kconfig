@@ -1062,13 +1062,21 @@ config ISA_DMA_API
 	bool
 
 config PCI
-	bool "PCI support" if ARCH_INTEGRATOR_AP || ARCH_VERSATILE_PB || ARCH_IXP4XX || ARCH_KS8695 || MACH_ARMCORE || ARCH_MMP
+	bool "PCI support" if (ARCH_INTEGRATOR_AP || ARCH_VERSATILE_PB || ARCH_IXP4XX || ARCH_KS8695 || MACH_ARMCORE || ARCH_MMP)
 	help
 	  Find out whether you have a PCI motherboard. PCI is the name of a
 	  bus system, i.e. the way the CPU talks to the other stuff inside
 	  your box. Other bus systems are ISA, EISA, MicroChannel (MCA) or
 	  VESA. If you have PCI, say Y, otherwise N.
 
+config PCI_TS47XX
+	bool "PCIe support on TS471X" if MACH_TS47XX && PCI	
+	help 
+	   Select this if you want to use the PCIe controller on the 
+	   TS-471X boards (PXA168 only, not PXA166).  Note that this
+	   will select the Marvell-supplied PCIe driver from 2.6.29,
+	   because the code that's in 2.6.34 doesn't seem to work.
+	   	  
 config PCI_SYSCALL
 	def_bool PCI
 
