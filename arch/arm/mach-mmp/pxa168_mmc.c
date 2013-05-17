@@ -1,3 +1,4 @@
+#if defined(CONFIG_MMC_PXA_SDH)
 #include <linux/platform_device.h>
 #include <linux/delay.h>
 #include <linux/interrupt.h>
@@ -55,3 +56,4 @@ void pxa_sdh_startclk(struct mmc_host *mmc)
 	enable_irq(host->irq);
 }
 EXPORT_SYMBOL_GPL(pxa_sdh_startclk);
+#endif
