@@ -28,7 +28,7 @@
 #include <plat/pfn_cfg.h>
 #include <linux/gpio.h>
 
-
+#if (0)
 #define SD_RESP_6	0x1c		/* Command Response 6 */
 #define SD_RESP_7	0x1e		/* Command Response 7 */
 
@@ -42,7 +42,7 @@
 #define SDCLK_SEL_SHIFT		8
 
 #define DRIVER_NAME	"pxa-sdh"
-#define MAX_SLOTS	8
+#define MAX_MMC_SLOTS	8
 
 /* SD spec says 74 clocks few more is okay */
 #define INIT_CLOCKS	80
@@ -64,7 +64,7 @@ struct sdhci_mmc_chip {
 	struct sdhci_mmc_fixes	*fixes;
 	unsigned int	quirks;
 	int	num_slots;	/* Slots on controller */
-	struct sdhci_mmc_slot	*slots[MAX_SLOTS];
+	struct sdhci_mmc_slot	*slots[MAX_MMC_SLOTS];
 	struct pxasdh_platform_data *pdata;
 	unsigned int	mrvl_quirks;
 };
@@ -77,6 +77,7 @@ struct sdhci_mmc_fixes {
 	int	(*suspend)(struct sdhci_mmc_chip*, pm_message_t);
 	int	(*resume)(struct sdhci_mmc_chip*);
 };
+#endif
 
 #define DBG(f, x...) \
 	pr_debug(DRIVER_NAME " [%s()]: " f, __func__,## x)
@@ -412,6 +413,7 @@ static void sdhci_mmc_remove_slot(struct sdhci_mmc_slot *slot)
 	u32 scratch;
 
 	DBG("ENTER %s\n", mmc_hostname(slot->host->mmc));
+			
 	dead = 0;
 	scratch = readl(slot->host->ioaddr + SDHCI_INT_STATUS);
 	if (scratch == (u32)-1)
@@ -610,13 +612,17 @@ static int __devexit pxa_sdh_remove(struct platform_device *pdev)
 
 	DBG ("ENTER");
 
-	chip = platform_get_drvdata(pdev);
+	chip = platform_get_drvdata(pdev);	
 	if (chip) {
-		for (i = 0;i < chip->num_slots; i++)
+		for (i = 0;i < chip->num_slots; i++) {
+		   if (chip->pdata->mfp_unconfig) 
+		      chip->pdata->mfp_unconfig();
+		   clk_disable(chip->slots[i]->clk);		   
 			sdhci_mmc_remove_slot(chip->slots[i]);
-		platform_set_drvdata(pdev, NULL);
-		clk_disable(chip->slots[i]->clk);
-		kfree(chip);
+		}
+								
+		platform_set_drvdata(pdev, NULL);						
+		kfree(chip);		
 	}
 	return 0;
 }
@@ -695,7 +701,7 @@ static int pxa_sdh_resume(struct platform_device *dev)
  * however, hold the command line high during this operation
  * so the attached card does not have to see and process this command.
  */
-
+#if (0)
 void pxa_sdh_startclk(struct mmc_host *mmc)
 {
 	unsigned int status_en_save;
@@ -736,6 +742,7 @@ void pxa_sdh_startclk(struct mmc_host *mmc)
 	enable_irq(host->irq);
 }
 EXPORT_SYMBOL_GPL(pxa_sdh_startclk);
+#endif
 
 static struct platform_driver pxa_sdh_driver = {
 	.probe		= pxa_sdh_probe,

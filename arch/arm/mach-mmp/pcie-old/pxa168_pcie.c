@@ -315,8 +315,6 @@ EXPORT_SYMBOL(pxa168_pcie_write32);
 static void pxa168_pcie_enable_link(void)
 {
 	unsigned int temp;
-
-	printk("%s\n", __func__);
 	
 	/*
 	 * Enable ANALOG_CTRL register in PCI-E PHY. This
@@ -585,8 +583,7 @@ static void __init pcie_channel_data_init(void)
 
 static void __init add_pcie_port(void)
 {
-   printk("%s\n", __func__);
-   
+  
 	/* TODO: Get this from platform data instead */
 	pxa168_gpio_pcie_init();
 	udelay(100);
@@ -600,9 +597,7 @@ static void __init add_pcie_port(void)
 }
 
 u32 __init pxa168_pcie_dev_id(void __iomem * base)
-{
-   printk("%s\n", __func__);
-   
+{   
 	return pxa168_pcie_read_reg(base, CONFIG_MEM, 0x0, 4);
 }
 
@@ -611,10 +606,13 @@ u32 __init pxa168_pcie_rev(void __iomem * base)
 	return pxa168_pcie_read_reg(base, CONFIG_MEM, 0x8, 4);
 }
 
+
+extern int getCpuModel(void);
+
 void __init pxa168_pcie_init(void)
 {
-   printk("%s\n", __func__);
-   
-	add_pcie_port();
-	pci_common_init(&pxa168_pci);
+   if (getCpuModel() == 0x168) {                     
+      add_pcie_port();
+      pci_common_init(&pxa168_pci);
+   }
 }

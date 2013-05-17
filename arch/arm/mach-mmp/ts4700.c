@@ -75,6 +75,11 @@ int tsGetModel(void) {
 }
 EXPORT_SYMBOL(tsGetModel);
 
+static unsigned short cpuModel;
+int getCpuModel(void) {
+   return cpuModel;  
+}
+
 extern void spi_flashinit(void);
 
 
@@ -478,7 +483,7 @@ static struct pca953x_platform_data max7312_data[] = {
 
 
 
-#if defined(CONFIG_MMC_PXA_SDH)
+#if defined(CONFIG_MMC_PXA_SDH) || defined(CONFIG_MMC_PXA_SDH_MODULE)
 
 static mfp_cfg_t ts4700_sdh_pins[] = {
 	GPIO51_MMC1_DAT3,
@@ -499,7 +504,7 @@ static mfp_cfg_t ts4700_sdh_pins[] = {
 };
 
 
-static void sdh_mfp_config(void)
+static int sdh_mfp_config(void)
 {	   
        
 	mfp_config(ARRAY_AND_SIZE(ts4700_sdh_pins));
@@ -508,18 +513,36 @@ static void sdh_mfp_config(void)
 	if ((model & 0x4710) == 0x4710) {
 	   volatile unsigned long *p = 
 	      (volatile unsigned long*)(APB_VIRT_BASE + 0x19000);
-	      
+	  
 	   /* Enable power to the offboard eMMC chip (471x, not 4700) */
 	   p[0x0c / 4] |= (1 << 26);
 	   p[0x24 / 4] = (1 << 26);
 	}
 #endif	
+   return 0;
 }
+
+static int sdh_mfp_unconfig(void)
+{	          
+#if defined(CONFIG_TS47XX_OFFBOARD_MMC)
+	if ((model & 0x4710) == 0x4710) {
+	   volatile unsigned long *p = 
+	      (volatile unsigned long*)(APB_VIRT_BASE + 0x19000);
+	      	      
+	   /* Disable power to the offboard eMMC chip (471x, not 4700) */
+	   p[0x18 / 4] = (1 << 26);
+	}
+#endif	
+
+   return 0;
+}
+
 
 static struct pxasdh_platform_data ts4700_sdh_platform_data_MMC1 = {
 	.detect_delay	= 20,
 	.ocr_mask	= MMC_VDD_29_30 | MMC_VDD_30_31,
 	.mfp_config	= sdh_mfp_config,
+	.mfp_unconfig	= sdh_mfp_unconfig,
 	.bus_width	= 4,
 };
 
@@ -1049,6 +1072,7 @@ DECLARE_PCI_FIXUP_HEADER(PCI_VENDOR_ID_INTEL, 1532, i210_pci_fixup);
 
 static void __init ts4700_init(void)
 {   
+   volatile unsigned long *mvgpioregs;
    int baseboardHasLCD;
 	mfp_config(ARRAY_AND_SIZE(ts4700_pin_config));
 
@@ -1063,53 +1087,58 @@ static void __init ts4700_init(void)
 
 	tsBaseBoard = 0;
 
+	
+	mvgpioregs = (unsigned long*)(APB_VIRT_BASE + 0x19000);
+   
+   mvgpioregs[0x10c/4] &= ~(1 << 25); 
+   if(mvgpioregs[0x100/4] & (1 << 25)) {
+      cpuModel = 0x166;
+      printk("CPU: pxa166\n");
+   }
+	else {
+	   cpuModel = 0x168;
+		printk("CPU pxa168\n");
+	}
+	
    {
       unsigned short prev1, prev2, prev3, prev4;
       unsigned int i, x;
       volatile unsigned short *vreg;
 
-      vreg = TS47XX_FPGA_VIRT_BASE; // ioremap(0x80004000,4096);
-      if (vreg == 0)
-         printk("ts4700_init: could not get fpga regs\n");
-      else
-      {         
+      vreg = TS47XX_FPGA_VIRT_BASE;                
          
 #define peek16(adr) (vreg[(adr)/2])
 #define poke16(adr, val) (vreg[(adr)/2] = (val))
 
-         prev1 = peek16(0x4);
-         prev2 = peek16(0x12);
-         prev3 = peek16(0x1a);
-         prev4 = peek16(0x10);
-         poke16(0x4, 0); /* disable muxbus */
-         poke16(0x10, prev4 & ~0x20);
-         poke16(0x1a, prev3 | 0x200);
-         for(i=0; i<8; i++) {
-            x = prev2 & ~0x1a00;
-            if (!(i & 1)) x |= 0x1000;
-            if (!(i & 2)) x |= 0x0800;
-            if (i & 4) x |= 0x0200;
-            poke16(0x12, x);
-            udelay(1);
-            tsBaseBoard = (tsBaseBoard >> 1);
-            if (peek16(0x20) & 0x20) tsBaseBoard |= 0x80;
-         }
-         poke16(0x4, prev1);
-         poke16(0x12, prev2);
-         poke16(0x1a, prev3);
-         poke16(0x10, prev4);
-
-        // iounmap(vreg);
-        
-        model = peek16(0);
-        
+      prev1 = peek16(0x4);
+      prev2 = peek16(0x12);
+      prev3 = peek16(0x1a);
+      prev4 = peek16(0x10);
+      poke16(0x4, 0); /* disable muxbus */
+      poke16(0x10, prev4 & ~0x20);
+      poke16(0x1a, prev3 | 0x200);
+      for(i=0; i<8; i++) {
+         x = prev2 & ~0x1a00;
+         if (!(i & 1)) x |= 0x1000;
+         if (!(i & 2)) x |= 0x0800;
+         if (i & 4) x |= 0x0200;
+         poke16(0x12, x);
+         udelay(1);
+         tsBaseBoard = (tsBaseBoard >> 1);
+         if (peek16(0x20) & 0x20) tsBaseBoard |= 0x80;
       }
+      poke16(0x4, prev1);
+      poke16(0x12, prev2);
+      poke16(0x1a, prev3);
+      poke16(0x10, prev4);
+       
+      model = peek16(0);              
    }
 
    tsBaseBoard &= 0x3F;       /* Only lower 6 bits are model; upper 2 bits are Rev. */
 
-   printk("Model: 0x%04X\n", model);   
-   printk("Baseboard: ");
+         
+   printk("Model: 0x%04X\nBaseboard: ", model);      
    switch(tsBaseBoard) {
    case 1:  printk("TS-8395\n"); break;
    case 2:  printk("TS-8390\n"); break;
@@ -1135,11 +1164,11 @@ static void __init ts4700_init(void)
       baseboardHasLCD = 0;
    }
 
+      
 	/* on-chip devices */
 	pxa168_add_uart(1);
 	pxa168_add_ssp(0);
 	pxa168_add_twsi(1, &pwri2c_info, ARRAY_AND_SIZE(pwri2c_board_info));
-
 
 #ifdef CONFIG_USB_GADGET_PXA_U2O
    pxa168_add_u2o(&ts4700_u2o_info);
@@ -1153,11 +1182,16 @@ static void __init ts4700_init(void)
 #ifdef CONFIG_USB_EHCI_PXA_U2H
  	pxa168_add_u2h(&ts4700_u2h_info);
 #endif
-#if defined(CONFIG_PCI) || defined(CONFIG_PCI_TS47XX) 
-	pxa168_add_pcie(&pxa168_pcie_data);
+#if defined(CONFIG_PCI) || defined(CONFIG_PCI_TS47XX)
+   if (cpuModel == 0x168) {
+      printk("Enabling PCIe (pxa168)\n"); 
+      pxa168_add_pcie(&pxa168_pcie_data);
+   } else {
+      printk("NOT Enabling PCIe (pxa166)\n");
+   }
 #endif
 	pxa168_add_mfu(&pxa168_eth_data);
-#if defined(CONFIG_MMC_PXA_SDH)
+#if defined(CONFIG_MMC_PXA_SDH) || defined(CONFIG_MMC_PXA_SDH_MODULE)
 	pxa168_add_sdh(1, &ts4700_sdh_platform_data_MMC1);
 #if defined(CONFIG_MMC1_EXTENDER)
    pxa168_add_sdh(1, &ts4700_sdh_platform_data_MMC1); // MMC1 on prototype
