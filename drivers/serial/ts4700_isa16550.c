@@ -33,7 +33,7 @@ MODULE_PARM_DESC(com, "Com address, eg (com=0x3f8,2f8");
 
 static int __init ts4700_isa16550_init(void)
 {
-	int line;
+	int line = 0;
 	unsigned int uart_irq[16];
 	unsigned int uart_com[16];
 	unsigned int uart_adr = FPGA_MUXBUS_BASE;
