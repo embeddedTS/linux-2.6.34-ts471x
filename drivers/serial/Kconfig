@@ -1514,4 +1514,17 @@ config TS4700_ISA16550
           Select this if you want to use Technologic Systems PC-104
           products that have 16550-style UARTS, e.g., the TS-SER2 board.
 
+config SERIAL_TSUART
+        tristate "TSUART support"
+        select SERIAL_CORE
+
+config SERIAL_TSUART_BAT3
+        tristate "TSUART driver for TS-BAT3"
+        depends on SERIAL_TSUART
+
+config SERIAL_TSUART_RF
+        tristate "TSUART driver for TS-RF2"
+        depends on SERIAL_TSUART
+
+
 endmenu
