@@ -30,7 +30,8 @@
 #include <asm/uaccess.h>
 #include "tsuart1.h"
 
-static unsigned int io=0,irq6=0,irq7=0;
+static unsigned long io=0;
+static int irq6=0,irq7=0;
 #define BOARD_ID_TSRF 0x5162
 
 static int mdmctrl(struct tsuart_port *ts,int mctrl) {
@@ -49,7 +50,6 @@ static int mdmctrl(struct tsuart_port *ts,int mctrl) {
 
 static int tryInitPort(int iobase) {
   struct tsuart_port *ts;
-  unsigned val;
   volatile unsigned char *sh;
 
   if (!io) {
@@ -71,17 +71,15 @@ static int tryInitPort(int iobase) {
   ts->boardId = BOARD_ID_TSRF;
   ts->mdmctrl = mdmctrl;
 
- sh = ((volatile unsigned char *) ioremap(io & 0xFFFFF000, 0xf)) + (io&0xFFF);
- if (sh == (volatile unsigned char *)io) {
-   printk(KERN_ERR "tsuart-rf: cannot map 0x%X\n",io);
+  sh = ((volatile unsigned char *) ioremap((io & 0xFFFFF000), 4096)) + (io & 0xFFF);
+ if (sh == 0) {
+   printk(KERN_ERR "tsuart-rf: cannot map the 8-bit IO + iobase 0x%X\n", iobase);
    return -ENOMEM;
   }
   sh += iobase;
-  val = sh[0];
-  if (val == 0x8e) {
-    val = sh[1];
+  if (sh[0] == 0x8e) {
     ts->localStatus |= PORT_STATUS_SHIRQ; //share IRQ6 & IRQ7 with IDE
-    if ((val & 0x80) == 0x80) {
+    if ((sh[1] & 0x80) == 0x80) {
       ts->u.irq = irq7; // IRQ 7
     } else {
       ts->u.irq = irq6; // IRQ 6
@@ -102,10 +100,10 @@ static int __init tsuart_init(void)
   int ports=0;
 
   if (!irq6) {
-    irq6 = 64 + 6;
+    irq6 = 68;
   }
   if (!irq7) {
-    irq7 = 64 + 7;
+    irq7 = 69;
   }
   if (tryInitPort(0x100)) {
     ports++;
@@ -134,10 +132,10 @@ static void __exit tsuart_exit(void)
 module_init(tsuart_init);
 module_exit(tsuart_exit);
 
-module_param(io, uint, 0644);
+module_param(io, ulong, 0644);
 MODULE_PARM_DESC(io, "Base address for TS-RF2 UARTS");
-module_param(irq6, uint, 0644);
+module_param(irq6, int, 0644);
 MODULE_PARM_DESC(io, "ARM IRQ for ISA IRQ 6");
-module_param(irq7, uint, 0644);
+module_param(irq7, int, 0644);
 MODULE_PARM_DESC(io, "ARM IRQ for ISA IRQ 7");
 

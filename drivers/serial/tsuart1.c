@@ -1323,7 +1323,7 @@ int tsuart_register_port(struct uart_driver *driver,
 
 #define SERIAL_TSUART_MAJOR	234	// in unassigned range (231-239)
 #define SERIAL_TSUART_MINOR	1
-#define TTY_NAME "ttts"
+#define TTY_NAME "ttytsuart"
 
 static int __init tsuart_init(void)
 {
