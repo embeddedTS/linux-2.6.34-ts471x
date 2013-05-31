@@ -315,8 +315,8 @@ static int __init tslcd_init(void)
 
    baseboard = tsGetBaseBoard();
 
-  if (baseboard == 10) {    /* TS-8900 */
-     printk("Baseboard: TS-8900\n");
+  if (baseboard == 10 || baseboard == 17) {    /* TS-8900 or TS-8920 */
+     printk("Baseboard: TS-89XX\n");
      gpioBase = 0x4004;
      vreg[1] |= BIT(11);      /* Enable the baseboard clock in the 4700's fpga (at 0x80004002) */
      vreg[2] = 0x321;         /* the bus config register */

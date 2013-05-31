@@ -79,10 +79,7 @@ static int __init ts4700_isa16550_init(void)
 			line++;
 	}
 
-	if (line > 0)
-		return 0;
-	else
-		return -1;
+	return 0;
 }
 
 static void __exit ts4700_isa16550_exit(void)

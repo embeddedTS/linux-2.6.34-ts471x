@@ -1142,15 +1142,15 @@ static void __init ts4700_init(void)
    switch(tsBaseBoard) {
    case 1:  printk("TS-8395\n"); break;
    case 2:  printk("TS-8390\n"); break;
-   case 9: printk("TS-8920\n"); break;
    case 10: printk("TS-8900\n"); break;
    case 11: printk("TS-8290\n"); break;
    case 15: printk("TS-8380\n"); break;      
+   case 17: printk("TS-8920\n"); break;
    default: printk("Unknown\n");
    }
 
    switch(tsBaseBoard) {
-   case 9:     /* TS-8920*/
+   case 17:     /* TS-8920*/
    case 10:    /* TS-8900 */
 #if (defined(CONFIG_FB_PXA168_OLD) || defined(CONFIG_FB_PXA168_OLD_MODULE) || defined(CONFIG_FB_PXA168) || defined(CONFIG_FB_PXA168_MODULE))	      
       ts4700_lcd_info.invert_pixclock = 1;
