@@ -1135,6 +1135,11 @@ static void __init ts4700_init(void)
       model = peek16(0);              
    }
 
+   if ((model & 0x4710) == 0x4700) {
+      cpuModel = 0x166;
+      printk("CPU: Force pxa166 for TS-4700\n");
+   }
+   
    tsBaseBoard &= 0x3F;       /* Only lower 6 bits are model; upper 2 bits are Rev. */
 
          

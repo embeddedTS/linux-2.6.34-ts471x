@@ -45,9 +45,9 @@ static unsigned long port[MAXDEV];
 static unsigned long mem[MAXDEV];
 static int __devinitdata irq[MAXDEV];
 static int __devinitdata clk[MAXDEV];
-static char __devinitdata cdr[MAXDEV] = {[0 ... (MAXDEV - 1)] = -1};
-static char __devinitdata ocr[MAXDEV] = {[0 ... (MAXDEV - 1)] = -1};
-static char __devinitdata indirect[MAXDEV] = {[0 ... (MAXDEV - 1)] = -1};
+static unsigned char __devinitdata cdr[MAXDEV] = {[0 ... (MAXDEV - 1)] = 0xFF};
+static unsigned char __devinitdata ocr[MAXDEV] = {[0 ... (MAXDEV - 1)] = 0xFF};
+static unsigned char __devinitdata indirect[MAXDEV] = {[0 ... (MAXDEV - 1)] = 0xFF};
 
 module_param_array(port, ulong, NULL, S_IRUGO);
 MODULE_PARM_DESC(port, "I/O port number");
@@ -148,7 +148,7 @@ static int __devinit sja1000_isa_probe(struct device *pdev, unsigned int idx)
 		}
 	} else {
 		if (indirect[idx] > 0 ||
-		    (indirect[idx] == -1 && indirect[0] > 0))
+		    (indirect[idx] == 0xFF && indirect[0] > 0))
 			iosize = SJA1000_IOSIZE_INDIRECT;
 		if (!request_region(port[idx], iosize, DRV_NAME)) {
 			err = -EBUSY;
@@ -190,16 +190,16 @@ static int __devinit sja1000_isa_probe(struct device *pdev, unsigned int idx)
 	else
 		priv->can.clock.freq = CLK_DEFAULT / 2;
 
-	if (ocr[idx] != -1)
+	if (ocr[idx] != 0xFF)
 		priv->ocr = ocr[idx] & 0xff;
-	else if (ocr[0] != -1)
+	else if (ocr[0] != 0xFF)
 		priv->ocr = ocr[0] & 0xff;
 	else
 		priv->ocr = OCR_DEFAULT;
 
-	if (cdr[idx] != -1)
+	if (cdr[idx] != 0xFF)
 		priv->cdr = cdr[idx] & 0xff;
-	else if (cdr[0] != -1)
+	else if (cdr[0] != 0xFF)
 		priv->cdr = cdr[0] & 0xff;
 	else
 		priv->cdr = CDR_DEFAULT;
