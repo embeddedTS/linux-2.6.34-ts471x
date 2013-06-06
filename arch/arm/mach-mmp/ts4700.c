@@ -1047,16 +1047,17 @@ static void ts4700_create_proc_irq(void)
    }
 }
 
-void ts4700_restart(char mode, const char *cmd)
-{
-	volatile unsigned short *syscon;
-	syscon = ioremap(0x80004000, 0x1000);
-	syscon[6/2] = 0x0; // Set the watchdog to 0.338s
-	while(1){
-	};
-}
 #define peek16(adr) (vreg[(adr)/2])
 #define poke16(adr, val) (vreg[(adr)/2] = (val))
+
+void ts4700_restart(char mode, const char *cmd)
+{
+	volatile unsigned short *vreg;
+	vreg = TS47XX_FPGA_VIRT_BASE;
+
+	peek16(0x6) = 0x0; // Set the watchdog to 0.338s
+	while(1){};
+}
 
 void ts4700_readbaseboard(volatile unsigned short *vreg)
 {
