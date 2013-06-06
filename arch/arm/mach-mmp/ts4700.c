@@ -1053,10 +1053,53 @@ void ts4700_restart(char mode, const char *cmd)
 	syscon = ioremap(0x80004000, 0x1000);
 	syscon[6/2] = 0x0; // Set the watchdog to 0.338s
 	while(1){
-		barrier();
 	};
 }
+#define peek16(adr) (vreg[(adr)/2])
+#define poke16(adr, val) (vreg[(adr)/2] = (val))
 
+void ts4700_readbaseboard(volatile unsigned short *vreg)
+{
+	unsigned short prev1, prev2, prev3, prev4;
+	unsigned int i, x;    
+	tsBaseBoard = 0;         
+
+	prev1 = peek16(0x4);
+	prev2 = peek16(0x12);
+	prev3 = peek16(0x1a);
+	prev4 = peek16(0x10);
+	poke16(0x4, 0); /* disable muxbus */
+	poke16(0x10, prev4 & ~0x20);
+	poke16(0x1a, prev3 | 0x200);
+	for(i=0; i<8; i++) {
+		x = prev2 & ~0x1a00;
+		if (!(i & 1)) x |= 0x1000;
+		if (!(i & 2)) x |= 0x0800;
+		if (i & 4) x |= 0x0200;
+		poke16(0x12, x);
+		udelay(1);
+		tsBaseBoard = (tsBaseBoard >> 1);
+		if (peek16(0x20) & 0x20) tsBaseBoard |= 0x80;
+	}
+	poke16(0x4, prev1);
+	poke16(0x12, prev2);
+	poke16(0x1a, prev3);
+	poke16(0x10, prev4);
+	/* Only lower 6 bits are model; upper 2 bits are Rev. */
+	tsBaseBoard &= 0x3F;       
+}
+
+static void ts4700_readcpumodel(void)
+{
+	volatile unsigned long *mvgpioregs;
+	mvgpioregs = (unsigned long*)(APB_VIRT_BASE + 0x19000);
+	mvgpioregs[0x10c/4] &= ~(1 << 25); 
+	if(mvgpioregs[0x100/4] & (1 << 25)) {
+		cpuModel = 0x166;
+	} else {
+		cpuModel = 0x168;
+	}
+}
 
 static void __devinit i210_pci_fixup(struct pci_dev *dev)
 {
@@ -1069,116 +1112,81 @@ static void __devinit i210_pci_fixup(struct pci_dev *dev)
 }
 DECLARE_PCI_FIXUP_HEADER(PCI_VENDOR_ID_INTEL, 1532, i210_pci_fixup);
 
-
 static void __init ts4700_init(void)
 {   
-   volatile unsigned long *mvgpioregs;
-   int baseboardHasLCD;
+	int baseboardHasLCD;
+	int enable_pcie;
+	volatile unsigned short *vreg;
+	vreg = TS47XX_FPGA_VIRT_BASE;
+
+
 	mfp_config(ARRAY_AND_SIZE(ts4700_pin_config));
 
 	arm_pm_restart = ts4700_restart;
 
-   pxa168_set_vdd_iox(VDD_IO0, VDD_IO_3P3V);
+	pxa168_set_vdd_iox(VDD_IO0, VDD_IO_3P3V);
 	pxa168_set_vdd_iox(VDD_IO1, VDD_IO_3P3V);
 	pxa168_set_vdd_iox(VDD_IO2, VDD_IO_3P3V);
 	pxa168_set_vdd_iox(VDD_IO3, VDD_IO_3P3V);
 	pxa168_set_vdd_iox(VDD_IO4, VDD_IO_3P3V);
 	pxa168_mfp_set_fastio_drive(MFP_DS02X);
 
-	tsBaseBoard = 0;
-
-	
-	mvgpioregs = (unsigned long*)(APB_VIRT_BASE + 0x19000);
-   
-   mvgpioregs[0x10c/4] &= ~(1 << 25); 
-   if(mvgpioregs[0x100/4] & (1 << 25)) {
-      cpuModel = 0x166;
-      printk("CPU: pxa166\n");
-   }
-	else {
-	   cpuModel = 0x168;
-		printk("CPU pxa168\n");
+	model = peek16(0x0);
+	switch (model) {
+	case 0x4700:
+		cpuModel = 0x166;
+		ts4700_readbaseboard(vreg);
+		enable_pcie = 0;
+		break;
+	case 0x7700:
+		ts4700_readcpumodel();
+		enable_pcie = 0;
+		break;
+	default:
+		ts4700_readcpumodel();
+		ts4700_readbaseboard(vreg);
+		if(cpuModel == 0x166)
+			enable_pcie = 0;
 	}
-	
-   {
-      unsigned short prev1, prev2, prev3, prev4;
-      unsigned int i, x;
-      volatile unsigned short *vreg;
 
-      vreg = TS47XX_FPGA_VIRT_BASE;                
-         
-#define peek16(adr) (vreg[(adr)/2])
-#define poke16(adr, val) (vreg[(adr)/2] = (val))
+	if(cpuModel == 0x166) printk("CPU: pxa166\n");
+	else if(cpuModel == 0x168) printk("CPU: pxa168\n");
 
-      prev1 = peek16(0x4);
-      prev2 = peek16(0x12);
-      prev3 = peek16(0x1a);
-      prev4 = peek16(0x10);
-      poke16(0x4, 0); /* disable muxbus */
-      poke16(0x10, prev4 & ~0x20);
-      poke16(0x1a, prev3 | 0x200);
-      for(i=0; i<8; i++) {
-         x = prev2 & ~0x1a00;
-         if (!(i & 1)) x |= 0x1000;
-         if (!(i & 2)) x |= 0x0800;
-         if (i & 4) x |= 0x0200;
-         poke16(0x12, x);
-         udelay(1);
-         tsBaseBoard = (tsBaseBoard >> 1);
-         if (peek16(0x20) & 0x20) tsBaseBoard |= 0x80;
-      }
-      poke16(0x4, prev1);
-      poke16(0x12, prev2);
-      poke16(0x1a, prev3);
-      poke16(0x10, prev4);
-       
-      model = peek16(0);              
-   }
+	printk("Model: 0x%04X\nBaseboard: ", model);      
+	switch(tsBaseBoard) {
+	case 1:  printk("TS-8395\n"); break;
+	case 2:  printk("TS-8390\n"); break;
+	case 10: printk("TS-8900\n"); break;
+	case 11: printk("TS-8290\n"); break;
+	case 15: printk("TS-8380\n"); break;      
+	case 17: printk("TS-8920\n"); break;
+	default: printk("Unknown\n");
+	}
 
-   if ((model & 0x4710) == 0x4700) {
-      cpuModel = 0x166;
-      printk("CPU: Force pxa166 for TS-4700\n");
-   }
-   
-   tsBaseBoard &= 0x3F;       /* Only lower 6 bits are model; upper 2 bits are Rev. */
-
-         
-   printk("Model: 0x%04X\nBaseboard: ", model);      
-   switch(tsBaseBoard) {
-   case 1:  printk("TS-8395\n"); break;
-   case 2:  printk("TS-8390\n"); break;
-   case 10: printk("TS-8900\n"); break;
-   case 11: printk("TS-8290\n"); break;
-   case 15: printk("TS-8380\n"); break;      
-   case 17: printk("TS-8920\n"); break;
-   default: printk("Unknown\n");
-   }
-
-   switch(tsBaseBoard) {
-   case 17:     /* TS-8920*/
-   case 10:    /* TS-8900 */
+	switch(tsBaseBoard) {
+	case 17:     /* TS-8920*/
+	case 10:    /* TS-8900 */
 #if (defined(CONFIG_FB_PXA168_OLD) || defined(CONFIG_FB_PXA168_OLD_MODULE) || defined(CONFIG_FB_PXA168) || defined(CONFIG_FB_PXA168_MODULE))	      
-      ts4700_lcd_info.invert_pixclock = 1;
+		ts4700_lcd_info.invert_pixclock = 1;
 #endif      
-   case 1:     /* TS-8395 */
-   case 2:     /* TS-8390 */
-   case 5:     /* TS-8400 */
-   case 11:    /* TS-8290 */
-   case 15:    /* TS-8380 */      
-      baseboardHasLCD = 1;
-      break;
-   default:
-      baseboardHasLCD = 0;
-   }
+	case 1:     /* TS-8395 */
+	case 2:     /* TS-8390 */
+	case 5:     /* TS-8400 */
+	case 11:    /* TS-8290 */
+	case 15:    /* TS-8380 */      
+		baseboardHasLCD = 1;
+	break;
+	default:
+		baseboardHasLCD = 0;
+	}
 
-      
 	/* on-chip devices */
 	pxa168_add_uart(1);
 	pxa168_add_ssp(0);
 	pxa168_add_twsi(1, &pwri2c_info, ARRAY_AND_SIZE(pwri2c_board_info));
 
 #ifdef CONFIG_USB_GADGET_PXA_U2O
-   pxa168_add_u2o(&ts4700_u2o_info);
+	pxa168_add_u2o(&ts4700_u2o_info);
 #endif
 
 #ifdef CONFIG_USB_OTG
@@ -1187,40 +1195,38 @@ static void __init ts4700_init(void)
 #endif
 
 #ifdef CONFIG_USB_EHCI_PXA_U2H
- 	pxa168_add_u2h(&ts4700_u2h_info);
+	pxa168_add_u2h(&ts4700_u2h_info);
 #endif
 #if defined(CONFIG_PCI) || defined(CONFIG_PCI_TS47XX)
-   if (cpuModel == 0x168) {
-      printk("Enabling PCIe (pxa168)\n"); 
-      pxa168_add_pcie(&pxa168_pcie_data);
-   } else {
-      printk("NOT Enabling PCIe (pxa166)\n");
-   }
+	if (enable_pcie) {
+		printk("CPU: Enabling PCIe\n");
+		pxa168_add_pcie(&pxa168_pcie_data);
+	} else {
+		printk("CPU: Disabling PCIe\n");
+	}
 #endif
 	pxa168_add_mfu(&pxa168_eth_data);
 #if defined(CONFIG_MMC_PXA_SDH) || defined(CONFIG_MMC_PXA_SDH_MODULE)
 	pxa168_add_sdh(1, &ts4700_sdh_platform_data_MMC1);
 #if defined(CONFIG_MMC1_EXTENDER)
-   pxa168_add_sdh(1, &ts4700_sdh_platform_data_MMC1); // MMC1 on prototype
+	pxa168_add_sdh(1, &ts4700_sdh_platform_data_MMC1); // MMC1 on prototype
 #endif
 #endif
 
 	pxa168_add_freq();
-	
+
 #if (defined(CONFIG_FB_PXA168_OLD) || defined(CONFIG_FB_PXA168_OLD_MODULE) || defined(CONFIG_FB_PXA168) || defined(CONFIG_FB_PXA168_MODULE))	
 	if (baseboardHasLCD) {
-	   pxa168_add_fb(&ts4700_lcd_info);
-	   pxa168_add_fb_ovly(&ts4700_lcd_ovly_info);
-	   
+		pxa168_add_fb(&ts4700_lcd_info);
+		pxa168_add_fb_ovly(&ts4700_lcd_ovly_info);
+
 #if (defined(CONFIG_TOUCHSCREEN_TSLCD) || defined(CONFIG_TOUCHSCREEN_TSLCD_MODULE))	   
-	   pxa_register_device(&pxa168_device_tslcd, 0, 0); 
+		pxa_register_device(&pxa168_device_tslcd, 0, 0); 
 #endif	   
 	}
 #endif
 
-
 	ts4700_create_proc_irq();
-
 }
 
 
