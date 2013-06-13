@@ -1120,7 +1120,6 @@ static void __init ts4700_init(void)
 	volatile unsigned short *vreg;
 	vreg = TS47XX_FPGA_VIRT_BASE;
 
-
 	mfp_config(ARRAY_AND_SIZE(ts4700_pin_config));
 
 	arm_pm_restart = ts4700_restart;
@@ -1140,6 +1139,7 @@ static void __init ts4700_init(void)
 		enable_pcie = 0;
 		break;
 	case 0x7700:
+	case 0x7750:
 		ts4700_readcpumodel();
 		enable_pcie = 0;
 		break;
@@ -1148,6 +1148,8 @@ static void __init ts4700_init(void)
 		ts4700_readbaseboard(vreg);
 		if(cpuModel == 0x166)
 			enable_pcie = 0;
+		else
+			enable_pcie = 1;
 	}
 
 	if(cpuModel == 0x166) printk("CPU: pxa166\n");
