@@ -341,10 +341,13 @@ struct pci_dev *pdev = NULL;
 
 
    while ((pdev = pci_get_device(PCI_VENDOR_ID_INTEL, 0x1532, pdev))) {
-  
       igb_probe(pdev, NULL);
    }
-
+   if(!pdev) {
+	   while ((pdev = pci_get_device(PCI_VENDOR_ID_INTEL, 0x1531, pdev))) {
+	      igb_probe(pdev, NULL);
+	   }
+   }
 
 	return ret;
 }
