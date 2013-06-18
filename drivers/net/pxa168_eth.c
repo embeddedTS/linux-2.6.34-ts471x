@@ -1173,8 +1173,11 @@ static int setPortConfigExt(struct pxa168_private *mp, int mtu)
 
 	/* add source/dest mac addr (12) + pid (2) + crc (4) */
 	mtu += ETH_EXTRA_HEADER;
+#ifdef CONFIG_VLAN_8021Q
+   mtu += 4;
+#endif   
 	if  (mtu <= 1518)
-		mtuSize = PCXR_MFL_1518;
+		mtuSize = PCXR_MFL_1518;	
 	else if (mtu <= 1536)
 		mtuSize = PCXR_MFL_1536;
 	else if (mtu <= 2048)
