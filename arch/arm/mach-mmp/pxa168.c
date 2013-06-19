@@ -351,10 +351,11 @@ postcore_initcall(pxa168_init);
  * PCI
  ****************************************************************************/
 #if defined(CONFIG_PCI) || defined(CONFIG_PCI_TS47XX) 
-
+extern int getPCIeEnable(void);
 static int __init pxa168_db_pci_init(void)
 {
-	pxa168_pcie_init();
+   if (getPCIeEnable())
+      pxa168_pcie_init();
 
 	return 0;
 }

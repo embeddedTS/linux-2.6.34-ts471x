@@ -583,17 +583,13 @@ static void __init pcie_channel_data_init(void)
 
 static void __init add_pcie_port(void)
 {
-  
 	/* TODO: Get this from platform data instead */
 	pxa168_gpio_pcie_init();
 	udelay(100);
-
 	/* Enable Clock to PCIe Controller */
 	__raw_writel(0xFF, AXI_VIRT_BASE + 0x82900);
-
 	pxa168_pcie_enable_link();
-
-	pcie_channel_data_init();
+	pcie_channel_data_init();		
 }
 
 u32 __init pxa168_pcie_dev_id(void __iomem * base)
@@ -607,12 +603,9 @@ u32 __init pxa168_pcie_rev(void __iomem * base)
 }
 
 
-extern int getCpuModel(void);
 
 void __init pxa168_pcie_init(void)
-{
-   if (getCpuModel() == 0x168) {                     
-      add_pcie_port();
-      pci_common_init(&pxa168_pci);
-   }
+{                     
+   add_pcie_port();
+   pci_common_init(&pxa168_pci);  
 }

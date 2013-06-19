@@ -80,6 +80,11 @@ int getCpuModel(void) {
    return cpuModel;  
 }
 
+static int enable_pcie;
+int getPCIeEnable(void) {
+   return enable_pcie;  
+}
+
 extern void spi_flashinit(void);
 
 
@@ -1052,8 +1057,7 @@ static void ts4700_create_proc_irq(void)
 
 void ts4700_restart(char mode, const char *cmd)
 {
-	volatile unsigned short *vreg;
-	vreg = TS47XX_FPGA_VIRT_BASE;
+	volatile unsigned short *vreg = (unsigned short *)TS47XX_FPGA_VIRT_BASE;
 
 	peek16(0x6) = 0x0; // Set the watchdog to 0.338s
 	while(1){};
@@ -1116,9 +1120,7 @@ DECLARE_PCI_FIXUP_HEADER(PCI_VENDOR_ID_INTEL, 1532, i210_pci_fixup);
 static void __init ts4700_init(void)
 {   
 	int baseboardHasLCD;
-	int enable_pcie;
-	volatile unsigned short *vreg;
-	vreg = TS47XX_FPGA_VIRT_BASE;
+	volatile unsigned short *vreg = (unsigned short *)TS47XX_FPGA_VIRT_BASE;
 
 	mfp_config(ARRAY_AND_SIZE(ts4700_pin_config));
 
