@@ -178,6 +178,34 @@ config SND_PXA3XX_SOC_ASPENITE
 	help
 	  Say Y if you want to add support for SoC audio on ZYLONITE2
 
+	  
+	  
+config SND_PXA3XX_SOC_TS47XX
+        tristate "SoC Audio support for ts4700"
+        depends on SND_PXA3XX_SOC && MACH_TS47XX         
+        help
+          Say Y if you want to add support for SoC audio on 
+          Technologic Systems' ts47xx board.
+
+config SND_PXA3XX_SOC_WM8750_TS47XX
+		tristate "SoC Audio support for WM8750 codec"
+		depends on SND_PXA3XX_SOC_TS47XX 	
+ 		select SND_SOC_WM8750
+      select SND_PXA3XX_SOC_SSP 		
+ 		help
+   		  Say Y if you want to add support for the WM8750 codec.
+   		  This codec is used on the TS-8395 base-board.
+	
+config SND_PXA3XX_SOC_SGTL5000_TS47XX
+		tristate "SoC Audio support for SGTL5000 codec"
+		depends on SND_PXA3XX_SOC_TS47XX 	
+ 		select SND_SOC_SGTL5000
+ 		select SND_PXA3XX_SOC_SSP 		
+ 		help
+   		  Say Y if you want to add support for the SGTL5000 codec.
+   		  This codec is used on the TS-8390 base-board.
+
+
 config SND_PXA168_SOC_AVLite
 	bool "SoC Audio support for AVLite"
 	depends on SND_PXA3XX_SOC && ARCH_MMP

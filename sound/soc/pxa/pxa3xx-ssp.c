@@ -549,6 +549,7 @@ struct snd_soc_dai pxa3xx_ssp_dai[] = {
 
 	},
 };
+
 EXPORT_SYMBOL_GPL(pxa3xx_ssp_dai);
 
 static int __init pxa3xx_ssp_modinit(void)

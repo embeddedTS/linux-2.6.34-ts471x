@@ -32,6 +32,7 @@ snd-soc-raumfeld-objs := raumfeld.o
 snd-soc-aspenite-objs := aspenite.o
 snd-soc-avlite-objs := avlite.o
 snd-soc-teton_bga-objs := teton_bga.o
+snd-soc-ts4700-objs := ts4700.o
 
 obj-$(CONFIG_SND_PXA2XX_SOC_CORGI) += snd-soc-corgi.o
 obj-$(CONFIG_SND_PXA2XX_SOC_POODLE) += snd-soc-poodle.o
@@ -50,3 +51,4 @@ obj-$(CONFIG_SND_SOC_RAUMFELD) += snd-soc-raumfeld.o
 obj-$(CONFIG_SND_PXA3XX_SOC_ASPENITE) += snd-soc-aspenite.o
 obj-$(CONFIG_SND_PXA168_SOC_AVLite) += snd-soc-avlite.o
 obj-$(CONFIG_SND_PXA3XX_SOC_TETON_BGA) += snd-soc-teton_bga.o
+obj-$(CONFIG_SND_PXA3XX_SOC_TS47XX) += snd-soc-ts4700.o

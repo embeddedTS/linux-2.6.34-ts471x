@@ -51,6 +51,6 @@
 #define PXA3XX_SSP_CLK_SCDB_4		1
 #define PXA3XX_SSP_CLK_SCDB_8		2
 
-extern struct snd_soc_dai pxa3xx_ssp_dai[5];
+extern struct snd_soc_dai pxa3xx_ssp_dai[];
 
 #endif
