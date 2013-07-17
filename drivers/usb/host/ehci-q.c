@@ -40,6 +40,7 @@
 
 /*-------------------------------------------------------------------------*/
 
+
 /* fill a qtd, returning how much of the buffer we were able to queue up */
 
 static int
@@ -445,7 +446,7 @@ qh_completions (struct ehci_hcd *ehci, struct ehci_qh *qh)
 				continue;
 
 			/* qh unlinked; token in overlay may be most current */
-			if (state == QH_STATE_IDLE
+			if (state == QH_STATE_UNLINK /* was QH_STATE_IDLE, in spite of comment on previous line */
 					&& cpu_to_hc32(ehci, qtd->qtd_dma)
 						== hw->hw_current) {
 				token = hc32_to_cpu(ehci, hw->hw_token);
@@ -454,6 +455,7 @@ qh_completions (struct ehci_hcd *ehci, struct ehci_qh *qh)
 				 * async transaction in the TT buffer.
 				 * We have to clear it.
 				 */
+							
 				ehci_clear_tt_buffer(ehci, qh, urb, token);
 			}
 
