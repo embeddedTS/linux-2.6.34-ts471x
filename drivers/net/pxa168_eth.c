@@ -274,7 +274,9 @@ enum hash_table_entry {
 
 static char pxa168_mac_str[] = {0x00,0x09,0x11,0x22,0x33,0x45};
 
-static char MarvellOUI[3] = {0x00, 0x09, 0x11};
+//static char MarvellOUI[3] = {0x00, 0x09, 0x11};
+static char TSOUI[3] = {0x00, 0xd0, 0x69};
+
 
 static int pxa168_eth_open(struct net_device *dev);
 static int pxa168_eth_stop(struct net_device *dev);
@@ -1821,7 +1823,7 @@ static int ethernet_phy_setup(struct net_device *dev)
 
 		/* if no mac address assigned -- generate one */
 		if (memcmp (dev->dev_addr, pxa168_mac_str, sizeof(pxa168_mac_str)) == 0) {
-			memcpy(dev->dev_addr, MarvellOUI, sizeof(MarvellOUI));
+			memcpy(dev->dev_addr, TSOUI, sizeof(TSOUI));
 			dev->dev_addr[0] |= (1<<6);  /* set locally admin bit */
 			get_random_bytes(&dev->dev_addr[3], 3);
 		}
@@ -1973,8 +1975,11 @@ static int pxa168_eth_probe(struct platform_device *pdev)
 	mp->rx_ring_size = NUM_RX_DESCS;
 	mp->tx_ring_size = NUM_TX_DESCS;
 	mp->port_num = 0;
-	memcpy (dev->dev_addr, pxa168_mac_str, sizeof(pxa168_mac_str));
 
+	// Set random mac address on startup
+	random_ether_addr(dev->dev_addr);
+	memcpy(dev->dev_addr, TSOUI, sizeof(TSOUI));
+	
 	/* start at 31 since it allows systems with phy's at */
 	/* addr 31 and 0 to be found quickly. */
 	/* Marvell boards have phys at addr 31 or 0  */
