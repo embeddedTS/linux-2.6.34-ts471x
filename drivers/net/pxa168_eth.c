@@ -1923,7 +1923,8 @@ static int pxa168_eth_probe(struct platform_device *pdev)
 	syscon = 0xfe400000; //ioremap(0x80004000, 0x1000);
 	model = ioread16(syscon);
 	printk("pxa168: model 0x%X\n", model);
-	if(model == 0x4712) {
+	if(model == 0x4712 ||
+           model == 0x4720) {
 		nophy = 1;
 		printk(KERN_INFO "pxa168: disabling phy\n");
 	}
