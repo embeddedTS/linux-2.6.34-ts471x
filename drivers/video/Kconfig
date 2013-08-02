@@ -1788,6 +1788,7 @@ config FB_PXA168
 	  Frame buffer driver for the built-in LCD controller in the Marvell
 	  MMP processor.
 
+
 config FB_PXA168_OLD
      tristate "PXA168 LCD framebuffer support"
      depends on FB && CPU_PXA168 && MACH_TS47XX
@@ -1805,7 +1806,14 @@ config FB_PXA168_OLD
          mknod /dev/fb0 c 29 0
          mknod /dev/fb1 c 29 1
 	  
+config FB_HDMI_SII9022
+   depends on MACH_TS47XX && (FB_PXA168 || FB_PXA168_OLD)
+        tristate "Silicon Image SII9022 DVI/HDMI Interface Chip"
+        help
+          Say Y here if you have a Technologic Systems baseboard with an
+          SII9022 HDMI Transmitter (e.g., TS-8290)
 	  
+	  	  
 config FB_PXA
 	tristate "PXA LCD framebuffer support"
 	depends on FB && ARCH_PXA

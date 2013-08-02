@@ -153,3 +153,5 @@ obj-$(CONFIG_FB_ST7565P)          += ts-st7565p-fb.o
 
 #video output switch sysfs driver
 obj-$(CONFIG_VIDEO_OUTPUT_CONTROL) += output.o
+
+obj-$(CONFIG_FB_HDMI_SII9022)      += hdmi_sii9022.o

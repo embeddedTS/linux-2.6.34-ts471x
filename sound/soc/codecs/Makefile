@@ -56,6 +56,7 @@ snd-soc-wm9713-objs := wm9713.o
 snd-soc-wm-hubs-objs := wm_hubs.o
 snd-soc-cs4344-objs := cs4344.o
 snd-soc-sgtl5000-objs := sgtl5000.o
+snd-soc-sii9022-objs := sii9022.o
 
 # Amp
 snd-soc-max9877-objs := max9877.o
@@ -125,3 +126,4 @@ obj-$(CONFIG_SND_SOC_SGTL5000)  += snd-soc-sgtl5000.o
 obj-$(CONFIG_SND_SOC_MAX9877)	+= snd-soc-max9877.o
 obj-$(CONFIG_SND_SOC_TPA6130A2)	+= snd-soc-tpa6130a2.o
 obj-$(CONFIG_SND_SOC_WM2000)	+= snd-soc-wm2000.o
+obj-$(CONFIG_SND_SOC_SII9022)	+= snd-soc-sii9022.o

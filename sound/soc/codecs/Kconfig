@@ -65,6 +65,7 @@ config SND_SOC_ALL_CODECS
 	select SND_SOC_WM8994 if MFD_WM8994
 	select SND_SOC_WM9081 if I2C
 	select SND_SOC_SGTL5000
+	select SND_SOC_SII9022
 	select SND_SOC_WM9705 if SND_SOC_AC97_BUS
 	select SND_SOC_WM9712 if SND_SOC_AC97_BUS
 	select SND_SOC_WM9713 if SND_SOC_AC97_BUS
@@ -264,7 +265,9 @@ config SND_SOC_WM9713
 config SND_SOC_SGTL5000
    tristate
 
-		
+config SND_SOC_SII9022
+   tristate
+   
 # Amp
 config SND_SOC_MAX9877
 	tristate

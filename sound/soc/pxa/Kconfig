@@ -181,11 +181,11 @@ config SND_PXA3XX_SOC_ASPENITE
 	  
 	  
 config SND_PXA3XX_SOC_TS47XX
-        tristate "SoC Audio support for ts4700"
+        tristate "SoC Audio support for ts471x"
         depends on SND_PXA3XX_SOC && MACH_TS47XX         
         help
           Say Y if you want to add support for SoC audio on 
-          Technologic Systems' ts47xx board.
+          Technologic Systems' ts471x board.
 
 config SND_PXA3XX_SOC_WM8750_TS47XX
 		tristate "SoC Audio support for WM8750 codec"
@@ -194,7 +194,7 @@ config SND_PXA3XX_SOC_WM8750_TS47XX
       select SND_PXA3XX_SOC_SSP 		
  		help
    		  Say Y if you want to add support for the WM8750 codec.
-   		  This codec is used on the TS-8395 base-board.
+   		  This codec is used on the TS-8395 and TS-8400 base-boards.
 	
 config SND_PXA3XX_SOC_SGTL5000_TS47XX
 		tristate "SoC Audio support for SGTL5000 codec"
@@ -205,7 +205,22 @@ config SND_PXA3XX_SOC_SGTL5000_TS47XX
    		  Say Y if you want to add support for the SGTL5000 codec.
    		  This codec is used on the TS-8390 base-board.
 
+config SND_PXA3XX_SOC_SII9022_TS47XX
+   tristate "SoC Audio support for SII9022 HDMI Transmitter"
+        depends on SND_PXA3XX_SOC_TS47XX
+        select SND_SOC_SII9022
+        help
+           Say Y if you want to add support for SoC audio with the SII9022.
+           Note that the SII9022 is not a codec, but we want to be able to
+           send it the same digital data that would normally go to an actual
+           codec.
 
+           You will also need to select "Silicon Image SII9022 DVI/HDMI
+           Interface Chip" in the frame-buffer support section (which in turn
+           requires that you select "PXA168 LCD framebuffer support").
+
+
+           
 config SND_PXA168_SOC_AVLite
 	bool "SoC Audio support for AVLite"
 	depends on SND_PXA3XX_SOC && ARCH_MMP

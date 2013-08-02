@@ -774,6 +774,7 @@ struct platform_device pxa168_device_cir = {
 #if (defined(CONFIG_FB_PXA168) || defined(CONFIG_FB_PXA168_MODULE) || defined(CONFIG_FB_PXA168_OLD) || defined(CONFIG_FB_PXA168_OLD_MODULE))
 static struct fb_videomode video_modes[] = {  	   	
    
+   
    [0] = {     /* For the 7-inch 800x480 Okaya LCD RV800480T */
       .pixclock       = 30066,  /* DCLK Typ: 33.26MHz */
       .refresh        = 60,
@@ -800,6 +801,21 @@ static struct fb_videomode video_modes[] = {
       .lower_margin   = 0,
       .sync           = FB_SYNC_VERT_HIGH_ACT | FB_SYNC_HOR_HIGH_ACT,
    },
+#if defined(CONFIG_FB_HDMI_SII9022) || defined (CONFIG_FB_HDMI_SII9022_MODULE)   
+   [2] = {
+      .pixclock       = 16129,
+      .refresh        = 60,
+      .xres           = 1280,
+      .yres           = 720,
+      .hsync_len      = 40,
+      .left_margin    = 220,
+      .right_margin   = 110,
+      .vsync_len      = 5,
+      .upper_margin   = 20,
+      .lower_margin   = 5,
+      .sync           = 0,
+   },
+#endif
 };
 #endif
 
@@ -815,8 +831,8 @@ struct pxa168fb_mach_info ts4700_lcd_info __initdata = {
 	.dumb_mode              = DUMB_MODE_RGB888,
 	.active                 = 1,
 	.panel_rbswap		= 1,
-	.pxa168fb_lcd_power     = NULL, //tpo_lcd_power,
-	.max_fb_size		= 800 * 600 * 4 * 2,
+	.pxa168fb_lcd_power     = NULL, //tpo_lcd_power,	
+	.max_fb_size		= 1280 * 720 * 4 * 2,
 	.invert_pixclock        = 0,
 };
 
@@ -828,8 +844,8 @@ struct pxa168fb_mach_info ts4700_lcd_ovly_info __initdata = {
 	.io_pin_allocation_mode = PIN_MODE_DUMB_24,
 	.dumb_mode              = DUMB_MODE_RGB888,
 	.active                 = 1,
-	.panel_rbswap		= 1,
-	.max_fb_size		= 800 * 600 * 4 * 2,
+	.panel_rbswap		= 1,	
+	.max_fb_size		= 1280 * 720 * 4 * 2,
 	.invert_pixclock        = 0,
 };
 
@@ -883,6 +899,7 @@ static struct i2c_board_info pwri2c_board_info[] = {
       .addr = 0x39,
       .platform_data = NULL,
    },
+   
 #endif
 
 };
@@ -1161,6 +1178,7 @@ static void __init ts4700_init(void)
 	switch(tsBaseBoard) {
 	case 1:  printk("TS-8395\n"); break;
 	case 2:  printk("TS-8390\n"); break;
+	case 5:  printk("TS-8400\n"); break;
 	case 10: printk("TS-8900\n"); break;
 	case 11: printk("TS-8290\n"); break;
 	case 15: printk("TS-8380\n"); break;      
@@ -1225,7 +1243,7 @@ static void __init ts4700_init(void)
 		pxa168_add_fb(&ts4700_lcd_info);
 		pxa168_add_fb_ovly(&ts4700_lcd_ovly_info);
 
-#if (defined(CONFIG_TOUCHSCREEN_TSLCD) || defined(CONFIG_TOUCHSCREEN_TSLCD_MODULE))	   
+#if (defined(CONFIG_TOUCHSCREEN_TSLCD) || defined(CONFIG_TOUCHSCREEN_TSLCD_MODULE))
 		pxa_register_device(&pxa168_device_tslcd, 0, 0); 
 #endif	   
 	}
