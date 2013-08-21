@@ -275,7 +275,7 @@ enum hash_table_entry {
 static char pxa168_mac_str[] = {0x00,0x09,0x11,0x22,0x33,0x45};
 
 //static char MarvellOUI[3] = {0x00, 0x09, 0x11};
-static char TSOUI[3] = {0x00, 0xd0, 0x69};
+static char TSOUI[4] = {0x00, 0xd0, 0x69, 0xf7};
 
 
 static int pxa168_eth_open(struct net_device *dev);
@@ -1825,7 +1825,7 @@ static int ethernet_phy_setup(struct net_device *dev)
 		if (memcmp (dev->dev_addr, pxa168_mac_str, sizeof(pxa168_mac_str)) == 0) {
 			memcpy(dev->dev_addr, TSOUI, sizeof(TSOUI));
 			dev->dev_addr[0] |= (1<<6);  /* set locally admin bit */
-			get_random_bytes(&dev->dev_addr[3], 3);
+			get_random_bytes(&dev->dev_addr[4], 2);
 		}
 
 		ethernet_phy_reset(mp);
