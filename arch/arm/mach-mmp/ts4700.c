@@ -297,39 +297,42 @@ static struct pxa168_eth_platform_data pxa168_eth_data = {
 
 #if defined(CONFIG_PCI) || defined(CONFIG_PCI_TS47XX)
 
-#define PCIE_1P5V_SHDN_N GPIO_EXT2(1)
+//#define PCIE_1P5V_SHDN_N GPIO_EXT2(1)
 #define PCIE_3P3V_SHDN_N GPIO_EXT2(2)
 #define PCIE_REFCLK_OE   GPIO_EXT2(6)
 
 /* TODO: make it a static function */
 int pxa168_gpio_pcie_init(void)
 {
-	if (gpio_request(PCIE_1P5V_SHDN_N, "PCIE_1P5V_SHDN_N")) {
+// This GPIO request makes PCIe never work on the TS-4710.
+// The DIO in question does not appear to exist?
+// Removed all PCIE_1P5V_SHDN_N references.
+/*	if (gpio_request(PCIE_1P5V_SHDN_N, "PCIE_1P5V_SHDN_N")) {
 		printk(KERN_ERR "%s %d: Request GPIO failed,"
 				"gpio: %d \n", __FILE__, __LINE__, PCIE_1P5V_SHDN_N);
 		return -EIO;
-	}
+	}*/
 
 	if (gpio_request(PCIE_3P3V_SHDN_N, "PCIE_3P3V_SHDN_N")) {
-		gpio_free(PCIE_1P5V_SHDN_N);
+//		gpio_free(PCIE_1P5V_SHDN_N);
 		printk(KERN_ERR "%s %d: Request GPIO failed,"
 				"gpio: %d\n", __FILE__, __LINE__, PCIE_3P3V_SHDN_N);
 		return -EIO;
 	}
 
 	if (gpio_request(PCIE_REFCLK_OE, "PCIE_REFCLK_OE")) {
-		gpio_free(PCIE_1P5V_SHDN_N);
+//		gpio_free(PCIE_1P5V_SHDN_N);
 		gpio_free(PCIE_3P3V_SHDN_N);
 		printk(KERN_ERR "%s %d: Request GPIO failed,"
 				"gpio: %d\n", __FILE__, __LINE__, PCIE_REFCLK_OE);
 		return -EIO;
 	}
 
-	gpio_direction_output(PCIE_1P5V_SHDN_N, 1);
+	//gpio_direction_output(PCIE_1P5V_SHDN_N, 1);
 	gpio_direction_output(PCIE_3P3V_SHDN_N, 1);
 	gpio_direction_output(PCIE_REFCLK_OE, 1);
 
-	gpio_free(PCIE_1P5V_SHDN_N);
+//	gpio_free(PCIE_1P5V_SHDN_N);
 	gpio_free(PCIE_3P3V_SHDN_N);
 	gpio_free(PCIE_REFCLK_OE);
 
