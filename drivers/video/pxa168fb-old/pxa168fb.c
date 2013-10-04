@@ -1223,6 +1223,8 @@ static int  pxa168fb_probe(struct platform_device *pdev)
 
 	if (baseboard == 10)   /* TS-8900  */
 	   myVideoMode = &mi->modes[1]; /* Use mode #1 (800x600) */
+	else if (baseboard == 5)
+	   myVideoMode = &mi->modes[3]; /* Use mode #3 (640x480) */
 
 	else
 	   myVideoMode = &mi->modes[0]; /* Use mode #0 (800x480) */

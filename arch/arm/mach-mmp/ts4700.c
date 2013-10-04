@@ -804,7 +804,6 @@ static struct fb_videomode video_modes[] = {
       .lower_margin   = 0,
       .sync           = FB_SYNC_VERT_HIGH_ACT | FB_SYNC_HOR_HIGH_ACT,
    },
-#if defined(CONFIG_FB_HDMI_SII9022) || defined (CONFIG_FB_HDMI_SII9022_MODULE)   
    [2] = {
       .pixclock       = 16129,
       .refresh        = 60,
@@ -818,7 +817,19 @@ static struct fb_videomode video_modes[] = {
       .lower_margin   = 5,
       .sync           = 0,
    },
-#endif
+   [3] = {
+      .pixclock       = 35000, /*35ns PXLCLK */
+      .refresh        = 60,
+      .xres           = 640,
+      .yres           = 480,
+      .hsync_len      = 50,
+      .left_margin    = 50,
+      .right_margin   = 70,
+      .vsync_len      = 50,
+      .upper_margin   = 0,
+      .lower_margin   = 0,
+      .sync           = FB_SYNC_VERT_HIGH_ACT | FB_SYNC_HOR_HIGH_ACT,
+   },
 };
 #endif
 
@@ -1192,12 +1203,12 @@ static void __init ts4700_init(void)
 	switch(tsBaseBoard) {
 	case 17:     /* TS-8920*/
 	case 10:    /* TS-8900 */
+	case 5:     /* TS-8400 */	
 #if (defined(CONFIG_FB_PXA168_OLD) || defined(CONFIG_FB_PXA168_OLD_MODULE) || defined(CONFIG_FB_PXA168) || defined(CONFIG_FB_PXA168_MODULE))	      
 		ts4700_lcd_info.invert_pixclock = 1;
 #endif      
 	case 1:     /* TS-8395 */
-	case 2:     /* TS-8390 */
-	case 5:     /* TS-8400 */
+	case 2:     /* TS-8390 */	
 	case 11:    /* TS-8290 */
 	case 15:    /* TS-8380 */      
 		baseboardHasLCD = 1;
