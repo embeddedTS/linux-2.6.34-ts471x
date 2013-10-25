@@ -1924,7 +1924,9 @@ static int pxa168_eth_probe(struct platform_device *pdev)
 	model = ioread16(syscon);
 	printk("pxa168: model 0x%X\n", model);
 	if(model == 0x4712 ||
-           model == 0x4720) {
+           model == 0x4720 ||
+           model == 0x7250
+           ) {
 		nophy = 1;
 		printk(KERN_INFO "pxa168: disabling phy\n");
 	}

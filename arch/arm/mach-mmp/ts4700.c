@@ -1171,6 +1171,7 @@ static void __init ts4700_init(void)
 		ts4700_readbaseboard(vreg);
 		enable_pcie = 0;
 		break;
+	case 0x7250:
 	case 0x7700:
 	case 0x7750:
 		ts4700_readcpumodel();
