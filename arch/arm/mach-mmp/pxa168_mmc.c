@@ -1,4 +1,4 @@
-#if defined(CONFIG_MMC_PXA_SDH)
+#if defined(CONFIG_MMC_PXA_SDH) || defined(CONFIG_MMC_PXA_SDH_MODULE)
 #include <linux/platform_device.h>
 #include <linux/delay.h>
 #include <linux/interrupt.h>

@@ -501,11 +501,11 @@ static mfp_cfg_t ts4700_sdh_pins[] = {
 	GPIO49_MMC1_CMD,
 	GPIO43_MMC1_CLK,
 
-   MFP_CFG_DRV(GPIO33, AF6, FAST),
-   MFP_CFG_DRV(GPIO32, AF6, FAST),
-   MFP_CFG_DRV(GPIO31, AF6, FAST),
-   MFP_CFG_DRV(GPIO30, AF6, FAST),
-   MFP_CFG_DRV(GPIO28, AF6, FAST),
+   MFP_CFG_DRV(GPIO33, AF6, FAST),  /* SD2_D3 */
+   MFP_CFG_DRV(GPIO32, AF6, FAST),  /* SD2_D2 */
+   MFP_CFG_DRV(GPIO31, AF6, FAST),  /* SD2_D1 */
+   MFP_CFG_DRV(GPIO30, AF6, FAST),  /* SD2_D0 */
+   MFP_CFG_DRV(GPIO28, AF6, FAST),  /* SD2_CMD */
    MFP_CFG_DRV(GPIO118, AF4, FAST),
    
    GPIO26_GPIO
@@ -517,7 +517,6 @@ static int sdh_mfp_config(void)
        
 	mfp_config(ARRAY_AND_SIZE(ts4700_sdh_pins));
 
-#if defined(CONFIG_TS47XX_OFFBOARD_MMC)
 	if ((model & 0x4710) == 0x4710) {
 	   volatile unsigned long *p = 
 	      (volatile unsigned long*)(APB_VIRT_BASE + 0x19000);
@@ -526,13 +525,13 @@ static int sdh_mfp_config(void)
 	   p[0x0c / 4] |= (1 << 26);
 	   p[0x24 / 4] = (1 << 26);
 	}
-#endif	
+	
    return 0;
 }
 
 static int sdh_mfp_unconfig(void)
 {	          
-#if defined(CONFIG_TS47XX_OFFBOARD_MMC)
+
 	if ((model & 0x4710) == 0x4710) {
 	   volatile unsigned long *p = 
 	      (volatile unsigned long*)(APB_VIRT_BASE + 0x19000);
@@ -540,8 +539,7 @@ static int sdh_mfp_unconfig(void)
 	   /* Disable power to the offboard eMMC chip (471x, not 4700) */
 	   p[0x18 / 4] = (1 << 26);
 	}
-#endif	
-
+	
    return 0;
 }
 
