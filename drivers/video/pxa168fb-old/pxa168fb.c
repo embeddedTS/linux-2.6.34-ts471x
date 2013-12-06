@@ -1225,7 +1225,8 @@ static int  pxa168fb_probe(struct platform_device *pdev)
 	   myVideoMode = &mi->modes[1]; /* Use mode #1 (800x600) */
 	else if (baseboard == 5)
 	   myVideoMode = &mi->modes[3]; /* Use mode #3 (640x480) */
-
+   else if (baseboard == 17)   /* TS-8920  */
+	   myVideoMode = &mi->modes[4]; /* Use mode #4 (1024x600) */
 	else
 	   myVideoMode = &mi->modes[0]; /* Use mode #0 (800x480) */
 #else
