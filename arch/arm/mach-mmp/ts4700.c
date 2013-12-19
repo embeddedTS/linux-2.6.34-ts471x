@@ -45,6 +45,10 @@
 #include <plat/pxa2xx_spi.h>
 #endif
 
+#if defined(CONFIG_TOUCHSCREEN_ILI210X) || defined(CONFIG_TOUCHSCREEN_ILI210X_MODULE)
+#include <linux/input/ili210x.h>
+#endif
+
 #include <linux/proc_fs.h>
 #include <linux/irq.h>
 #include <linux/uaccess.h>
@@ -255,6 +259,9 @@ static unsigned long ts4700_pin_config[] __initdata = {
 
    GPIO27_SMC_IRQ,   /* TS FPGA interrupt is on MFP #27 */
 
+   
+   GPIO49_GPIO,
+   
 };
 
 #define ENET_RESET_N GPIO_EXT1(9)
@@ -492,8 +499,8 @@ static struct pca953x_platform_data max7312_data[] = {
 
 
 #if defined(CONFIG_MMC_PXA_SDH) || defined(CONFIG_MMC_PXA_SDH_MODULE)
-
 static mfp_cfg_t ts4700_sdh_pins[] = {
+
 	GPIO51_MMC1_DAT3,
 	GPIO52_MMC1_DAT2,
 	GPIO40_MMC1_DAT1,
@@ -828,6 +835,19 @@ static struct fb_videomode video_modes[] = {
       .lower_margin   = 0,
       .sync           = FB_SYNC_VERT_HIGH_ACT | FB_SYNC_HOR_HIGH_ACT,
    },
+   [4] = {     /* For the 10.4-inch 1024x600 boundary devices LCD */
+      .pixclock       = 20000,   /* tclk 51.2MHz */
+      .refresh        = 60,
+      .xres           = 1024,
+      .yres           = 600,
+      .hsync_len      = 50,
+      .left_margin    = 50,
+      .right_margin   = 70,
+      .vsync_len      = 50,
+      .upper_margin   = 0,
+      .lower_margin   = 0,
+      .sync           = FB_SYNC_VERT_HIGH_ACT | FB_SYNC_HOR_HIGH_ACT,
+   },
 };
 #endif
 
@@ -889,12 +909,41 @@ struct pxa168fb_mach_info ts4700_lcd_ovly_info __initdata = {
 };
 #endif
 
+#if defined(CONFIG_TOUCHSCREEN_ILI210X) || defined(CONFIG_TOUCHSCREEN_ILI210X_MODULE)
+static bool ili210x_pendown_state(void)
+{
+   
+	unsigned int pen;
+	pen = mfp_to_gpio(MFP_PIN_GPIO49);
+    gpio_request(pen, "ili210x pendown irq");
+	gpio_direction_input(pen);
+
+
+	//return 0;
+}
+
+static struct ili210x_platform_data ili_info = {
+	.irq_flags =  0,
+	.poll_period = 1,
+	.get_pendown_state	= ili210x_pendown_state,
+};
+#endif
 
 static struct i2c_board_info pwri2c_board_info[] = {
    {
 		.type           = "nothing",
 		.addr           = 0x2a,  //
 	},
+#if defined(CONFIG_TOUCHSCREEN_ILI210X) || defined(CONFIG_TOUCHSCREEN_ILI210X_MODULE)
+
+	{
+	    .type = "ili210x",
+	    .addr = 0x41,
+	    .platform_data = &ili_info,
+	    .irq = IRQ_GPIO(49),
+	},
+	
+#endif	
 #if defined(CONFIG_RTC_DRV_DS1307)
    {
 		.type		= "m41t00",   // RTC
@@ -1070,8 +1119,8 @@ static void ts4700_create_proc_irq(void)
       if (!desc)
          continue;
 
-      if(irq > 80)
-	 break;
+      if(irq >= NR_IRQS)
+         break;
 
       sprintf(name, "irq/%d/irq", irq);
 
@@ -1251,6 +1300,8 @@ static void __init ts4700_init(void)
 
 	pxa168_add_freq();
 
+	
+	
 #if (defined(CONFIG_FB_PXA168_OLD) || defined(CONFIG_FB_PXA168_OLD_MODULE) || defined(CONFIG_FB_PXA168) || defined(CONFIG_FB_PXA168_MODULE))	
 	if (baseboardHasLCD) {
 		pxa168_add_fb(&ts4700_lcd_info);

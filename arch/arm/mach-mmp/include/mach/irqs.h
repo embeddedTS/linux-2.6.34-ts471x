@@ -222,7 +222,11 @@
 
 #define IRQ_MMP2_MUX_END		(IRQ_MMP2_SSP_BASE + 2)
 
+#ifdef CONFIG_MACH_TS47XX
+#define IRQ_GPIO_START			81
+#else
 #define IRQ_GPIO_START			64
+#endif
 #define IRQ_GPIO_NUM			128
 #define IRQ_GPIO(x)			(IRQ_GPIO_START + (x))
 #define IRQ_TO_GPIO(x)			((x) - IRQ_GPIO_START)

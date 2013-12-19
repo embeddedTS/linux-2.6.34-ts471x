@@ -61,11 +61,8 @@ static void __init pxa168_init_gpio(void)
 void __init pxa168_init_irq(void)
 {
 	icu_init_irq();
-#ifdef CONFIG_MACH_TS47XX
 	ts4700_init_mux_irq();
-#else
 	pxa168_init_gpio();
-#endif
 }
 
 struct gc_rate_table {
