@@ -1583,6 +1583,15 @@ static void eth_tx_submit_descs_for_skb(struct pxa168_private *mp,
 	desc = &mp->p_tx_desc_area[tx_index];
 
 	length = skb->len;
+
+#ifdef CONFIG_PXA_SWITCH_WORKAROUND
+   {
+      unsigned short *usp = (unsigned short *)skb->data;
+      if (usp[6] == 0x0081 && length > 60 && length < 64)
+         length += (64 - length);
+	}
+#endif
+
 	mp->tx_skb[tx_index] = skb;
 
 	desc->byte_cnt = length;
@@ -1651,6 +1660,7 @@ static int pxa168_eth_start_xmit(struct sk_buff *skb, struct net_device *dev)
 	struct pxa168_private *mp = netdev_priv(dev);
 	struct net_device_stats *stats = &dev->stats;
 	unsigned long flags;
+	
 #ifdef RESTART_DMA_WORKAROUND
 	int w_cnt;
 	int timedout;
@@ -1671,6 +1681,7 @@ static int pxa168_eth_start_xmit(struct sk_buff *skb, struct net_device *dev)
 		return NETDEV_TX_BUSY;
 	}
 
+	
 	if (skb_shinfo(skb)->nr_frags && __skb_linearize(skb)) {
 		spin_lock_irqsave(&mp->lock, flags);
 			stats->tx_dropped++;
@@ -1920,7 +1931,7 @@ static int pxa168_eth_probe(struct platform_device *pdev)
 	u16 model;
 
 	printk(KERN_NOTICE "PXA168 10/100 Ethernet Driver\n");
-	syscon = 0xfe400000; //ioremap(0x80004000, 0x1000);
+	syscon = (unsigned long *)0xfe400000; //ioremap(0x80004000, 0x1000);
 	model = ioread16(syscon);
 	printk("pxa168: model 0x%X\n", model);
 	if(model == 0x4712 ||
