@@ -1587,7 +1587,7 @@ static void eth_tx_submit_descs_for_skb(struct pxa168_private *mp,
 #ifdef CONFIG_PXA_SWITCH_WORKAROUND
    {
       unsigned short *usp = (unsigned short *)skb->data;
-      if (usp[6] == 0x0081 && length > 60 && length < 64)
+      if (usp[6] == 0x0081 && length < 64 && length > 60)
          length += (64 - length);
 	}
 #endif
