@@ -1137,6 +1137,7 @@ void ts4700_restart(char mode, const char *cmd)
 {
 	volatile unsigned short *vreg = (unsigned short *)TS47XX_FPGA_VIRT_BASE;
 
+	local_irq_disable();
 	peek16(0x6) = 0x0; // Set the watchdog to 0.338s
 	while(1){};
 }
