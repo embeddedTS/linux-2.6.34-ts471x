@@ -1160,6 +1160,10 @@ static void autoconfig(struct uart_8250_port *up, unsigned int probeflags)
 	if (!(up->port.flags & UPF_SKIP_TEST)) {
 		serial_outp(up, UART_MCR, UART_MCR_LOOP | 0x0A);
 		status1 = serial_inp(up, UART_MSR) & 0xF0;
+		status1 = serial_inp(up, UART_MSR) & 0xF0;
+		status1 = serial_inp(up, UART_MSR) & 0xF0;
+		status1 = serial_inp(up, UART_MSR) & 0xF0;
+		status1 = serial_inp(up, UART_MSR) & 0xF0;
 		serial_outp(up, UART_MCR, save_mcr);
 		if (status1 != 0x90) {
 			DEBUG_AUTOCONF("LOOP test failed (%02x) ",
