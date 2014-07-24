@@ -524,7 +524,9 @@ static int sdh_mfp_config(void)
        
 	mfp_config(ARRAY_AND_SIZE(ts4700_sdh_pins));
 
-	if ((model & 0x4710) == 0x4710) {
+   if ((model & 0x4710) == 0x4710
+      || (model & 0x4740) == 0x4740
+      || (model & 0x4720) == 0x4720) {
 	   volatile unsigned long *p = 
 	      (volatile unsigned long*)(APB_VIRT_BASE + 0x19000);
 	  
@@ -539,7 +541,9 @@ static int sdh_mfp_config(void)
 static int sdh_mfp_unconfig(void)
 {	          
 
-	if ((model & 0x4710) == 0x4710) {
+   if ((model & 0x4710) == 0x4710
+      || (model & 0x4740) == 0x4740
+      || (model & 0x4720) == 0x4720) {
 	   volatile unsigned long *p = 
 	      (volatile unsigned long*)(APB_VIRT_BASE + 0x19000);
 	      	      
