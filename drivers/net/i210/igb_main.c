@@ -104,7 +104,7 @@ static DEFINE_PCI_DEVICE_TABLE(igb_pci_tbl) = {
 	{ PCI_VDEVICE(INTEL, E1000_DEV_ID_82575EB_COPPER) },
 	{ PCI_VDEVICE(INTEL, E1000_DEV_ID_82575EB_FIBER_SERDES) },
 	{ PCI_VDEVICE(INTEL, E1000_DEV_ID_82575GB_QUAD_COPPER) },
-	{ PCI_VDEVICE(INTEL, 1532) },
+	{ PCI_VDEVICE(INTEL, 0x1532) },
 	/* required last entry */
 	{0, }
 };
@@ -338,16 +338,6 @@ struct pci_dev *pdev = NULL;
 		register_reboot_notifier(&igb_notifier_reboot);
 	}
 #endif
-
-
-   while ((pdev = pci_get_device(PCI_VENDOR_ID_INTEL, 0x1532, pdev))) {
-      igb_probe(pdev, NULL);
-   }
-   if(!pdev) {
-	   while ((pdev = pci_get_device(PCI_VENDOR_ID_INTEL, 0x1531, pdev))) {
-	      igb_probe(pdev, NULL);
-	   }
-   }
 
 	return ret;
 }
