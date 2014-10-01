@@ -1161,17 +1161,16 @@ static int sgtl5000_init(struct snd_soc_device *socdev)
 	
 	reg = sgtl5000_read(codec, SGTL5000_CHIP_ANA_CTRL);
 	reg |= (SGTL5000_LINE_OUT_MUTE | SGTL5000_HP_MUTE);
+	sgtl5000_write(codec, SGTL5000_CHIP_ANA_CTRL, reg); /* mute hp & lo */
 	if (nostandby) {
-	 	sgtl5000_write(codec, SGTL5000_CHIP_ANA_CTRL, reg); /* mute hp & lo */
 	   sgtl5000_set_bias_level(codec, SND_SOC_BIAS_ON);
 	   reg &= ~(SGTL5000_LINE_OUT_MUTE | SGTL5000_HP_MUTE);
 	   sgtl5000_write(codec, SGTL5000_CHIP_ANA_CTRL, reg);  /* unmute them */
 	}
 	else {
-	   sgtl5000_write(codec, SGTL5000_CHIP_ANA_CTRL, reg);
 	   sgtl5000_set_bias_level(codec, SND_SOC_BIAS_STANDBY);
-	   sgtl5000_add_widgets(codec);	   
 	}
+	sgtl5000_add_widgets(codec);	   
 
 	return 0;
 }
