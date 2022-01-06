@@ -1810,7 +1810,7 @@ config FB_HDMI_SII9022
    depends on MACH_TS47XX && (FB_PXA168 || FB_PXA168_OLD)
         tristate "Silicon Image SII9022 DVI/HDMI Interface Chip"
         help
-          Say Y here if you have a Technologic Systems baseboard with an
+          Say Y here if you have a embeddedTS baseboard with an
           SII9022 HDMI Transmitter (e.g., TS-8290)
 	  
 	  	  
@@ -2145,7 +2145,7 @@ config FB_ST7565P
 	---help---
 	  This is a `virtual' frame buffer device specifically for the
 	  ST7565P LCD display device when attached to a 
-	  Technologic Systems TS-8290 or TS-8280 board.
+	  embeddedTS TS-8290 or TS-8280 board.
 	  
 	  This driver also requires a userspace program ("lcd-helper") to communicate 
 	  with the ST7565P via SPI.

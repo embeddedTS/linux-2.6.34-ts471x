@@ -513,5 +513,5 @@ module_exit(sii9022_exit);
 
 
 MODULE_DESCRIPTION("ASoC SII9022 driver");
-MODULE_AUTHOR("Technologic Systems, Inc.");
+MODULE_AUTHOR("embeddedTS, Inc.");
 MODULE_LICENSE("GPL");

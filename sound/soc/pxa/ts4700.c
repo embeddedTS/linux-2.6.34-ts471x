@@ -1,5 +1,5 @@
 /*
- * ts4700.c  --  SoC audio for Technologic Systems' ts47xx board
+ * ts4700.c  --  SoC audio for embeddedTS' ts47xx board
  *
  * At the time of writing, TS baseboards had either an SGTL5000 or WM8750
  * codec, or an SII9022 HDMI Transmitter.  The latter isn't a codec, of

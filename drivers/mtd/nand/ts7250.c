@@ -1,7 +1,7 @@
 /*
  * drivers/mtd/nand/ts7250.c
  *
- * Copyright (C) 2004 Technologic Systems (support@embeddedARM.com)
+ * Copyright (C) 2004-2022 Technologic Systems, Inc. dba embeddedTS (support@embeddedTS.com)
  *
  * Derived from drivers/mtd/nand/edb7312.c
  *   Copyright (C) 2004 Marius Gröger (mag@sysgo.de)
@@ -203,5 +203,5 @@ static void __exit ts7250_cleanup(void)
 module_exit(ts7250_cleanup);
 
 MODULE_LICENSE("GPL");
-MODULE_AUTHOR("Jesse Off <joff@embeddedARM.com>");
-MODULE_DESCRIPTION("MTD map driver for Technologic Systems TS-7250 board");
+MODULE_AUTHOR("Jesse Off <joff@embeddedTS.com>");
+MODULE_DESCRIPTION("MTD map driver for embeddedTS TS-7250 board");

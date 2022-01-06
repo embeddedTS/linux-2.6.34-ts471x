@@ -187,6 +187,6 @@ module_param_string(irq, airq, sizeof(airq), 0644); // Point to IRQ 5
 module_param_string(io8, aio8, sizeof(aio8), 0644); // ISA 8-bit bus at addr 0x0
 module_param_string(io16, aio16, sizeof(aio16), 0644); // ISA 16-bit bus at addr 0x0
 
-MODULE_AUTHOR("Mark Featherston <mark@embeddedarm.com>");
+MODULE_AUTHOR("Mark Featherston <mark@embeddedTS.com>");
 MODULE_LICENSE("GPL");
 MODULE_DESCRIPTION("TS-RF2-CF IDE driver");

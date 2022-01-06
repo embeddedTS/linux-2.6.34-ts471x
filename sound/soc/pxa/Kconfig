@@ -185,7 +185,7 @@ config SND_PXA3XX_SOC_TS47XX
         depends on SND_PXA3XX_SOC && MACH_TS47XX         
         help
           Say Y if you want to add support for SoC audio on 
-          Technologic Systems' ts471x board.
+          embeddedTS' ts471x board.
 
 config SND_PXA3XX_SOC_WM8750_TS47XX
 		tristate "SoC Audio support for WM8750 codec"
